@@ -1,0 +1,598 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Wed May 15 16:48:46 2019
+
+@author: ptruong
+"""
+
+
+from proteinSearch import *
+
+
+from triqlerParser import *
+from triqlerProcessor import * 
+from utils import * 
+from parseReformattedPSSS3equDecoy import * # Needs to tidy and place functions in right place!
+from corrPlot import * #correlation plotting
+from diffExp import * 
+from qvalue import *
+
+import os
+import pandas as pd
+import numpy as np
+from scipy import stats
+import scipy as sp
+import subprocess
+#%matplotlib inline
+import matplotlib.pyplot as plt 
+import seaborn as sns
+sns.set(font_scale=2)
+sns.set_style("whitegrid", {'axes.grid' : False})#, 'grid.color': '.1', 'grid.linestyle': u'-'})
+
+
+
+###########
+# PARTS ###
+###########
+def getMixtures(trunc = False):
+    if trunc == False:
+        a_mix = np.array([0.5] * 10)
+        a_mix[0] += 0.0001
+        c_mix = np.array([0.5, 0.25, 0.125, 0.0625, 0.031, 0.0155, 0.008, 0.004, 0.002, 0.0])
+        h_mix = np.array([0.0, 0.25, 0.375, 0.4375, 0.469, 0.4845, 0.492, 0.496, 0.498, 0.5])
+        a_mix = a_mix/a_mix.sum()
+        c_mix = c_mix/c_mix.sum()
+        h_mix = h_mix/h_mix.sum()
+        mix = {'A thaliana':a_mix, 'C elegans': c_mix, 'H sapiens': h_mix}
+        return mix, h_mix, c_mix, a_mix
+    else:
+        # Dropped S01 and S10
+        a_mix = np.array([0.5] * 8)
+        a_mix[0] += 0.0001
+        c_mix = np.array([0.25, 0.125, 0.0625, 0.031, 0.0155, 0.008, 0.004, 0.002])
+        h_mix = np.array([0.25, 0.375, 0.4375, 0.469, 0.4845, 0.492, 0.496, 0.498])
+        a_mix = a_mix/a_mix.sum()
+        c_mix = c_mix/c_mix.sum()
+        h_mix = h_mix/h_mix.sum()
+        mix = {'A thaliana':a_mix, 'C elegans': c_mix, 'H sapiens': h_mix}
+        return mix, h_mix, c_mix, a_mix    
+
+def comparisonsPlots(fileDirectory, psss3File, FDR_treshold, diff_exp, unlogTriqler, logSpectronaut, dropS01S10, basefig):
+    """
+    fileDirectory - file directory for triqler outputs
+    psss3file - PSSS3 filename
+    
+    """
+    ############
+    ## triqler #
+    ############
+    
+    print("Loading triqler file for comparison plot...")
+    triqler = table2Df(fileDirectory + "/" + "proteins.1vs2.tsv", peptideSeperator = True) # For this part any proteins.<x>vs<y>.tsv works, since all the proteinQuants are the same
+    triqler = triqler.dropna()
+    triqler = triqler2Numeric(triqler)
+    triqler = getTriqlerDetailed(triqler)
+    
+    # FDR on protein_id_posterior_error_prob
+    triqler.sort_values(by = "protein_id_posterior_error_prob", inplace = True)
+    triqler["FDR"] = triqler["protein_id_posterior_error_prob"].expanding().mean()
+    triqler = triqler[triqler["FDR"] < FDR_treshold]
+    
+    df_triqler = triqler
+    runs = getRuns(triqler, startRun = "S01:S01_R01", endRun = "S10:S10_R05")
+    conditionRuns = getConditionRuns(runs)
+    unique_run = conditionRuns.run.unique()
+    run_id = getConditionRunId(triqler, unique_run[0])
+    
+    # All runs
+    at_t = df_triqler[df_triqler["specie"] == "ARATH"]
+    ce_t = df_triqler[df_triqler["specie"] == "CAEEL"]
+    hs_t = df_triqler[df_triqler["specie"] == "HUMAN"]
+    
+    # DROP species and drop peptides <------------------------
+    at_t = renameTriqler2Vital(at_t, diff_exp = diff_exp)
+    ce_t = renameTriqler2Vital(ce_t, diff_exp = diff_exp)
+    hs_t = renameTriqler2Vital(hs_t, diff_exp = diff_exp)
+    
+    if unlogTriqler == True:    
+        at_t = 10**at_t
+        ce_t = 10**ce_t
+        hs_t = 10**hs_t
+    
+    # Drop S01 or S10
+    if dropS01S10 == True:
+        at_t = at_t.drop(["S01", "S10"], axis = 1)
+        ce_t = ce_t.drop(["S01", "S10"], axis = 1)
+        hs_t = hs_t.drop(["S01", "S10"], axis = 1)
+    
+    
+    ########################
+    ## psss3  unfiltered ###
+    ########################
+    print("Loading PSSS3 for comparisons plot...")
+    df = pd.read_csv(psss3File, sep ="\t")
+    
+    FDR_treshold = FDR_treshold
+    df = df[df["qvalue"].fillna(-1)<FDR_treshold]
+    
+    decoy = df["decoy"].apply(lambda x: "decoy_" if x == True else "")
+    df["protein"] = decoy+df["protein"]
+    
+    df_reform = getTriqlerOutputFormat_from_reformattedRawPSSS3(df, noDecoy = False)
+    psss3 = df_reform
+    
+    psss3.reset_index(level=0, inplace = True)
+    df_psss3 = addSpecieProteinColumns(psss3, startRun = "S01:S01_R01", endRun = "S10:S10_R05")
+    #df_psss3 = df_psss3.dropna()
+    
+    at_s = df_psss3[df_psss3["specie"] == "ARATH"]
+    ce_s = df_psss3[df_psss3["specie"] == "CAEEL"]
+    hs_s = df_psss3[df_psss3["specie"] == "HUMAN"]
+    
+    
+    if logSpectronaut == True:
+        at_s.iloc[:,3:] = np.log10(at_s.iloc[:,3:])
+        ce_s.iloc[:,3:] = np.log10(ce_s.iloc[:,3:])
+        hs_s.iloc[:,3:] = np.log10(hs_s.iloc[:,3:])
+    
+    if dropS01S10 == True:
+        # Dropped S01 and S10
+        repl_cols = ["S02","S03","S04","S05","S06","S07","S08","S09"]
+    else:
+        repl_cols = ["S01","S02","S03","S04","S05","S06","S07","S08","S09","S10"]
+    
+    at_s = renameTriqler2Vital_nonDetailed(at_s)
+    ce_s = renameTriqler2Vital_nonDetailed(ce_s)
+    hs_s = renameTriqler2Vital_nonDetailed(hs_s)
+    
+    
+    
+    if dropS01S10 == True:
+        # Drop S01 or S10
+        at_s = at_s.drop(["S01", "S10"], axis = 1)
+        ce_s = ce_s.drop(["S01", "S10"], axis = 1)
+        hs_s = hs_s.drop(["S01", "S10"], axis = 1)
+    
+    
+    ##################################################
+    #                                               ##
+    #   ########################################    ##
+    #   ###     COMPARISONS                 ####    ##
+    #   ########################################    ##
+    #                                               ##    
+    ##################################################
+    
+    ######################################
+    # Normalize to per-protein abundance #
+    ######################################
+    print("normalizing and formatting...")
+    normalized_protein_at_s = at_s.div(at_s.sum(axis=1), axis=0)
+    normalized_protein_ce_s = ce_s.div(ce_s.sum(axis=1), axis=0)
+    normalized_protein_hs_s = hs_s.div(hs_s.sum(axis=1), axis=0)
+    
+    ##########################################
+    ## Merge normalized spectronaut species ##
+    ##########################################
+    
+    sampgroup_at_s,sampgroup_hs_s,sampgroup_ce_s = pd.DataFrame(),pd.DataFrame(),pd.DataFrame()
+    
+    def adjustPandasNaNSum(df, replicate = "S01"):
+        """
+        Pandas sum of NaN = 0, this
+        """
+        repl = replicate
+        replicates = df[repl]
+        replicates['total'] = replicates.sum(axis=1)    
+        replicates.loc[replicates[repl].isnull().all(1),'total']=np.nan
+        return replicates['total']
+    
+    for s in repl_cols:
+        #sampgroup_at_s[s] = normalized_protein_at_s[s].sum(1)
+        #sampgroup_ce_s[s] = normalized_protein_ce_s[s].sum(1)
+        #sampgroup_hs_s[s] = normalized_protein_hs_s[s].sum(1)
+        sampgroup_at_s[s] = adjustPandasNaNSum(normalized_protein_at_s, s)
+        sampgroup_ce_s[s] = adjustPandasNaNSum(normalized_protein_ce_s, s)
+        sampgroup_hs_s[s] = adjustPandasNaNSum(normalized_protein_hs_s, s)
+        
+    
+    sampgroup_at_s['Species'] = ['A thaliana'] *len(normalized_protein_at_s)
+    sampgroup_ce_s['Species'] = ['C elegans']  *len(normalized_protein_ce_s)
+    sampgroup_hs_s['Species'] = ['H sapiens']  *len(normalized_protein_hs_s)
+    sampgroup_at_s['Method']  = ['Spectronaut']*len(normalized_protein_at_s)
+    sampgroup_ce_s['Method']  = ['Spectronaut']*len(normalized_protein_ce_s)
+    sampgroup_hs_s['Method']  = ['Spectronaut']*len(normalized_protein_hs_s)
+    
+    sampgroup_spec_s = pd.concat([sampgroup_at_s,sampgroup_ce_s,sampgroup_hs_s])
+    
+    ######################################
+    ## Merge normalized Triqler species ##
+    ######################################
+    
+    normalized_protein_at_t = at_t.div(at_t.sum(axis=1), axis=0)
+    normalized_protein_ce_t = ce_t.div(ce_t.sum(axis=1), axis=0)
+    normalized_protein_hs_t = hs_t.div(hs_t.sum(axis=1), axis=0)
+    
+    sampgroup_at_t,sampgroup_hs_t,sampgroup_ce_t = pd.DataFrame(),pd.DataFrame(),pd.DataFrame()
+    
+    for t in repl_cols:
+        sampgroup_at_t[t] = normalized_protein_at_t[t].sum(1)
+        sampgroup_ce_t[t] = normalized_protein_ce_t[t].sum(1)
+        sampgroup_hs_t[t] = normalized_protein_hs_t[t].sum(1)
+        
+    sampgroup_at_t['Species'] = ['A thaliana'] *len(normalized_protein_at_t)
+    sampgroup_ce_t['Species'] = ['C elegans']  *len(normalized_protein_ce_t)
+    sampgroup_hs_t['Species'] = ['H sapiens']  *len(normalized_protein_hs_t)
+    sampgroup_at_t['Method']  = ['Triqler']*len(normalized_protein_at_t)
+    sampgroup_ce_t['Method']  = ['Triqler']*len(normalized_protein_ce_t)
+    sampgroup_hs_t['Method']  = ['Triqler']*len(normalized_protein_hs_t)
+    
+    sampgroup_spec_t = pd.concat([sampgroup_at_t,sampgroup_ce_t,sampgroup_hs_t])
+    
+    
+    ###############################
+    # Merge both analysis methods #
+    ###############################
+    sampgroup = sampgroup_spec_t
+    sampgroup = sampgroup_spec_s
+    sampgroup = sampgroup_spec_t.append(sampgroup_spec_s)
+    
+    sampgroup["Protein"] = sampgroup.index
+    
+    unmeltsamp = sampgroup.copy()
+    sampgroup=pd.melt(sampgroup, id_vars=['Method', 'Species','Protein'], value_vars=repl_cols)
+    sampgroup.rename(columns={'variable':'Sample','value':'Expression'}, inplace=True)
+    
+    sampgroup = unmeltsamp
+    sampgroup = pd.melt(sampgroup, id_vars=['Method', 'Species','Protein'], value_vars=repl_cols)
+    sampgroup.rename(columns={'variable':'Sample','value':'Expression'}, inplace=True)
+    
+    if dropS01S10 == True:
+        # Dropped S01 and S10
+        mix, h_mix, c_mix, a_mix = getMixtures(trunc = True)
+    else:    
+        mix, h_mix, c_mix, a_mix = getMixtures(trunc = False)
+        
+    print("Generating comparisons plot...")
+    fig, ax = plt.subplots(figsize=(13, 8))
+    #sns.violinplot(data=sampgroup.loc[sampgroup['Species'] == "H sapiens"], x="Sample",y="Expression", hue="Method",split=True)
+    sns.boxplot(data=sampgroup.loc[sampgroup['Species'] == "H sapiens"], x="Sample",y="Expression", hue="Method",fliersize=0)
+    for i in range(len(h_mix)):
+        ax.plot([i-.2, i+.2], [h_mix[i], h_mix[i]], '-', color='red', lw=5)
+    ax.set_ylim(0,0.26)
+    ax.set_ylabel("Fraction of protein total abundance per sample")
+    sns.despine(offset=10, trim=True)
+    plt.title("HomoSapiens" + basefig)  
+    fig.savefig(fileDirectory + "/results/" + "HomoSapeins" + basefig +".png")
+    
+    fig, ax = plt.subplots(figsize=(13, 8))
+    #sns.violinplot(data=sampgroup.loc[sampgroup['Species'] == "H sapiens"], x="Sample",y="Expression", hue="Method",split=True)
+    sns.boxplot(data=sampgroup.loc[sampgroup['Species'] == "C elegans"], x="Sample",y="Expression", hue="Method",fliersize=0)
+    for i in range(len(c_mix)):
+        ax.plot([i-.2, i+.2], [c_mix[i], c_mix[i]], '-', color='red', lw=5)
+    ax.set_ylim(0,0.9)
+    ax.set_ylabel("Fraction of protein total abundance per sample")
+    plt.title('Caenorhabditis elegans' + basefig)  
+    fig.savefig(fileDirectory + "/results/" + 'Caenorhabditis elegans' + basefig +".png")
+    
+    sns.despine(offset=10, trim=True)
+    
+    fig, ax = plt.subplots(figsize=(15, 9)) 
+    #sns.violinplot(data=sampgroup.loc[sampgroup['Species'] == "H sapiens"], x="Sample",y="Expression", hue="Method",split=True)
+    sns.boxplot(data=sampgroup.loc[sampgroup['Species'] == "A thaliana"], x="Sample",y="Expression", hue="Method",fliersize=0)
+    for i in range(len(a_mix)):
+        ax.plot([i-.2, i+.2], [a_mix[i], a_mix[i]], '-', color='red', lw=5)
+    ax.set_ylim(0,0.2)
+    ax.set_ylabel("Fraction of protein total abundance per sample")
+    plt.title('Arabidopsis thaliana' + basefig)  
+    fig.savefig(fileDirectory + "/results/" + 'Arabidopsis thaliana' + basefig +".png")
+    
+    sns.despine(offset=10, trim=True)
+    
+    
+    #############################
+    ## CORRELATION COEFFICIENTS #
+    #############################
+    # CORRELATION PLOTTING FUNCTIONS.
+    print("Generating correlations plot...")
+    from scipy.stats.stats import pearsonr
+    from numpy import log10
+    
+    def my_corr(row):#, mix):
+        if dropS01S10 == True:
+            mix, h_mix, c_mix, a_mix = getMixtures(trunc = True)
+        else:
+            mix, h_mix, c_mix, a_mix = getMixtures(trunc = False)
+        mymix = mix[row['Species']]
+        row = row.loc[repl_cols]
+        ixs = (row != 0.0)
+        a = np.array(row.loc[ixs])
+        b = mymix[ixs]
+        return pearsonr(a,b)[0]
+    
+    def p_r_plot(species,figname=None):
+        fig, ax = plt.subplots(figsize=(10, 6))
+        N=5000
+        for meth in unmeltsamp['Method'].unique():
+            sns.distplot(unmeltsamp[(unmeltsamp['Method']==meth) & (unmeltsamp['Species']==species)]['Correlation, R'],
+                 hist_kws={"cumulative":-1, "linewidth": 3, "alpha": 1,"histtype": "step"},
+                 bins=N, kde=False, ax=ax, label=meth, norm_hist = True)
+        ax.set_xlim(-0.9,1.0)
+        ax.set_ylim(0,1.2)
+        ax.set_title(species)
+        sns.despine(offset=10, trim=True)
+        ax.set_ylabel("Number of proteins")
+        ax.set_xlabel("Cumulative samples "r"$\leq$" " correlation coefficient")
+        plt.legend()
+        if figname:
+            fig.savefig(figname)
+    
+    
+    unmeltsamp['Correlation, R'] = unmeltsamp.apply(my_corr, axis=1)
+    unmeltsamp.dropna(inplace=True)
+    #unmeltsamp.isna().sum().sum()
+    unmeltsamp.isnull().sum().sum()
+    
+    p_r_plot('H sapiens'+basefig, fileDirectory + "/results/" + 'HomoSapiens_CorrPlot'+basefig+".png")
+    p_r_plot('C elegans'+basefig, fileDirectory + "/results/" + "CElegans_CorrPlot"+basefig+".png")
+    p_r_plot('A thaliana'+basefig, fileDirectory + "/results/" + "AThaliana_CorrPlot"+basefig+".png")
+    
+    return df_psss3 # returns this for diffExp generation
+
+    #spec = 'H sapiens'
+    #unmeltsamp[unmeltsamp["Species"] == spec ]["Correlation, R"].min()
+    #unmeltsamp[unmeltsamp["Species"] == spec ]["Correlation, R"].max()
+    
+def generateDiffExpPlot(fileDirectory, df_psss3, FDR_treshold, logSpectronaut, basefig):
+        comparisons = getComparisons(fileDir = fileDirectory, filePrefix = "proteins", fileSuffix = ".tsv")
+        comparisons.remove([''])
+        triqlerComps  = getTriqlerComparisons(comparisons, prefix = "proteins", suffix = "tsv")
+        spectronautComps = getSpectronautComparison(comparisons)
+        
+        # Input directory of triqler outputs    
+        diffExpDir = fileDirectory
+        FDRTreshold = FDR_treshold
+        specieList = [None, "ARATH", "CAEEL", "HUMAN"]
+        for k in specieList:
+            specie = k
+            if specie == None:
+                print("Generating AllSpecies DiffExp...")
+            else:
+                print("Generating " + specie + " DiffExp...")
+            diffExpComps = processComparisons(triqlerOutputDir = diffExpDir,
+                               PSSS3 = df_psss3,
+                               comparisons = comparisons,
+                               triqlerComps = triqlerComps,
+                               spectronautComps = spectronautComps,
+                               FDRTreshold = FDRTreshold,
+                               specie = specie,
+                               logSpectronaut = logSpectronaut)
+            comp_df = neatifyDiffExpComps(diffExpComps, comparisons)
+            all_df = meltCompDf(comp_df)
+            if specie == None:
+                specieTitle = "AllSpec"
+            else:
+                specieTitle = specie
+            diffExpTitle = specieTitle + basefig
+            
+            barplotComps(all_df, diffExpTitle, 
+                         fileDirectory + "/results/" + specieTitle+'_diffExpPlot'+basefig+".png")
+
+
+def fixNonShared(libraryDirectory = "library/LKaell/", 
+                 humanLib = "uniprot_sprot_2017-10-25_HUMAN_ISOFORMS.fasta",
+                 arathLib = "uniprot_sprot_2018-01-24_ARATH_ISOFORMS.fasta",
+                 caeelLib = "uniprot-elegans-filtered-organism__Caenorhabditis+elegans.fasta",
+                 filename = "500-PSSS3-equ decoy_Report.xls",
+                 outputname = "500-PSSS3-equ decoy_Report_nonShared_20190507.xls"):
+    findUniqueProteins(inputName = filename, outputName = "proteins.csv")
+    uniprot = getPSSS3Uniprot(libraryDirectory = libraryDirectory, 
+                              humanLib = humanLib,
+                              arathLib = arathLib,
+                              caeelLib = caeelLib)
+    singleProteins = findSingleProteins(filename="proteins.csv")
+    shared, nonShared = findShared(filename = "proteins.csv") 
+    
+    filename = filename
+    outputname = outputname
+    
+    f = open(filename, "r")
+    new_file = open(outputname, "w")
+    #line = f.readline().split("\t")
+    #i = 0
+    for line in f:
+        #i+=1
+        row = line.split("\t")
+        if row[3] in nonShared:
+            row[3] = row[3].split(";")[0]       
+        new_line = "\t".join(row)
+        new_file.write(new_line)
+    
+    ################################################################
+    # Code for fixing laste 15 lines                               #
+    # unknown why last 15 lines wont get appended on previous code #
+    ################################################################
+    
+    def tail(filename, lines):
+        import sys
+        import os
+        
+        bufsize = 8192
+        
+        lines = lines #int(sys.argv[1])
+        fname = filename #sys.argv[2]
+        fsize = os.stat(fname).st_size
+        
+        iter = 0
+        #with open(sys.argv[2]) as f:
+        with open(fname) as f:
+            if bufsize > fsize:
+                bufsize = fsize-1
+            data = []
+            while True:
+                iter +=1
+                f.seek(fsize-bufsize*iter)
+                data.extend(f.readlines())
+                if len(data) >= lines or f.tell() == 0:
+                    output = (''.join(data[-lines:]))
+                    return output
+                    break
+        #return tailLines
+    
+    tailLines = tail(filename, 16)
+    tailLines = tailLines.split("\n")#.split("\t")
+    new_file = open(outputname, "a")
+    for line in tailLines:
+        if line == "":
+            continue
+        row = line.split("\t")
+        if row[3] in nonShared:
+            row[3] = row[3].split(";")[0]
+        new_line = "\t".join(row)
+        new_file.write(new_line)
+        
+def main():
+    for j in range(len(fileDirList)):
+        print("Performining analysis " + str(j) + " of " + str(len(fileDirList)))
+        fileDir = fileDirList[j]
+        try:
+            dirName = fileDir + "/results"
+            os.mkdir(dirName)
+            print("Directory " + dirName + " created!")
+        except:
+            print("Directory " + dirName + "already exists!")
+            
+        print("Analyzing " + fileDir)
+        if (fileDir[-3] == "0") or (fileDir[-3] == "1"):
+            diff_exp = (float(fileDir[-3:].replace("-", ".")))
+        else:
+            diff_exp = 1.0
+        fileDirectory = fileDir
+    
+        diff_exp = diff_exp #for parsing
+        print("params")
+        print("unlogTriqler: " + str(unlogTriqler))
+        print("logSpectronaut: " + str(logSpectronaut))
+        print("truncate: " + str(dropS01S10))
+        print("FDR_treshold: " + str(FDR_treshold))
+    
+        basefig = ""
+        if unlogTriqler == True:
+            basefig += "_unlogTriqler"
+        if logSpectronaut == True:
+            basefig += "_logSpectronaut"
+        if dropS01S10 == True:
+            basefig += "_trunc"
+        basefig += "_FDR" + str(FDR_treshold).replace(".", "")
+        
+        df_psss3 = comparisonsPlots(fileDirectory = fileDirectory, 
+                                    psss3File = psss3File, 
+                                    FDR_treshold = FDR_treshold,
+                                    diff_exp = diff_exp,
+                                    unlogTriqler = unlogTriqler,
+                                    logSpectronaut = logSpectronaut,
+                                    dropS01S10 = dropS01S10,
+                                    basefig = basefig)
+    
+        ###########################
+        # DiffExp COMPARISONS #####
+        ###########################
+        print("Generating DiffExp plot...")
+        generateDiffExpPlot(fileDirectory = fileDirectory,
+                            df_psss3 = df_psss3,
+                            FDR_treshold = FDR_treshold,
+                            logSpectronaut = logSpectronaut,
+                            basefig = basefig)
+
+##############
+# Converters #
+##############
+
+def convertSpectronaut2Triqler(inputArg = "500-PSSS3-equ\ decoy_Report.xls", outputName = "PSSS3_triqlerFormatted.csv"):
+    """
+    Calls convert_spectronaut_to_triqler_input.py to convert PSSS3 file to triqler input formatted file.
+    """
+    inputArg = inputArg
+    outputName = outputName
+    command = "python2 convert_spectronaut_to_triqler_input.py" + " " + inputArg + " " + outputName
+    os.system(command)
+
+def callTriqler(inputArg = "PSSS3_triqlerFormatted.csv"):
+    inputArg = "PSSS3_triqlerFormatted.csv"
+    command = "python -m triqler" + " " + inputArg
+    os.system(command)
+
+def convertPSSS3toReformattedPSSS3(inputArg = '500-PSSS3-equ decoy_Report.xls', outputName = "500-PSSS3-raw-reformatted_dropna_dropdup_decoy.csv"):
+    inputArg = inputArg
+    outputName = outputName
+    df = parsePSSS3equDecoy(filename = inputArg) # VERY SLOW
+    df = df.drop_duplicates()
+    df.to_csv(outputName, sep = "\t", index = False)
+    del df    
+
+
+if __name__ == "__main__":
+    
+    ##############
+    # SET PARAMS #
+    ##############
+    runTriqler = False
+    preprocessShared = False
+    psss3File = "500-PSSS3-raw-reformatted_dropna_dropdup_decoy_nonShared_again.csv"
+    unlogTriqler = False
+    logSpectronaut = False
+    dropS01S10 = True
+    FDR_treshold = 0.01
+    
+    fileDirList = [
+            "triqlerOutput_noShared_largeScaleOptimizations_minSamp15_logFold1-2",
+            "triqlerOutput_noShared_muneg5_minSamp15_logFold0-1",
+            "triqlerOutput_noShared_muneg5",
+            "triqlerOutput_noShared_largeScaleOptimizations_minSamp15",
+            "triqlerOutput_noShared_largeScaleOptimizations_minSamp15_logFold0-1"
+            ]
+    psss3File = "500-PSSS3-raw-reformatted_dropna_dropdup_decoy_nonShared_again.csv"
+    
+    #################
+    # PREPROCESSING #
+    #################
+    # Data parsing
+
+    
+    if preprocessShared == True:
+        print("Adjusting shared peptides...")
+        fixNonShared(libraryDirectory = "library/LKaell/", 
+                     humanLib = "uniprot_sprot_2017-10-25_HUMAN_ISOFORMS.fasta",
+                     arathLib = "uniprot_sprot_2018-01-24_ARATH_ISOFORMS.fasta",
+                     caeelLib = "uniprot-elegans-filtered-organism__Caenorhabditis+elegans.fasta",
+                     filename = "500-PSSS3-equ decoy_Report.xls",
+                     outputname = "500-PSSS3-equ decoy_Report_nonShared.xls")
+        
+        print("parsing PSSS3 file...")
+        df = parsePSSS3equDecoy(filename = '500-PSSS3-equ decoy_Report_nonShared.xls')
+        df.to_csv('500-PSSS3-equ decoy_Report_nonShared.csv') # Saving a clone of the parsed data frame.
+    
+    if runTriqler = True:
+        convertSpectronaut2Triqler() # toDo fix so we converted shared stuff
+        callTriqler(inputArg = "PSSS3_triqlerFormatted_nonShared.csv") # look at this
+        convertPSSS3toReformattedPSSS3(inputArg = '500-PSSS3-equ decoy_Report_nonShared.xls',
+                                       outputName = "500-PSSS3-raw-reformatted_dropna_dropdup_decoy_nonShared.csv")   
+    
+    """
+    #unlogTriqler, logSpectronaut, dropS01S10
+    paramsList = [(False,False,False),
+                  (False,False,True),
+                  (True,False,False),
+                  (True,False,True),
+                  (False,True,False),
+                  (False,True,True)]
+    
+    print("STARTING EXPERIMENTS...")
+    for param_i in range(len(paramsList)):
+        param = paramsList[param_i]
+        unlogTriqler = param[0]
+        logSpectronaut = param[1]
+        dropS01S10 = param[2]
+    """    
+    
+    main()
