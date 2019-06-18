@@ -20,9 +20,9 @@ Also here is a link to a page [page2](page_2)
 
 ## Project Log
 ### 2019-06-18 comparison with default settings.
-![](2019-06-18/H_sapiens.png)
-![](2019-06-18/A_thjaliana.png)
-![](2019-06-18/C_elegans.png)
+![](plots/2019-06-18/H_sapiens.png)
+![](plots/2019-06-18/A_thjaliana.png)
+![](plots/2019-06-18/C_elegans.png)
 
 Plotted using:
 
