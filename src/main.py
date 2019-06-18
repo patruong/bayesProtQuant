@@ -13,7 +13,7 @@ from triqlerParser import *
 from triqlerProcessor import * 
 from utils import * 
 from parseReformattedPSSS3equDecoy import * # Needs to tidy and place functions in right place!
-from corrPlot import * #correlation plotting
+#from corrPlot import * #correlation plotting
 
 import os
 import pandas as pd
@@ -602,7 +602,7 @@ def adjustNonShared(libraryDirectory = "library/LKaell/",
 ### MAIN #####
 ##############
 
-def main_singleImpute(impute_method = "min", truncated = False, triqlerExponential = 2, global_impute = True, maxNaN = 6,
+def main_singleImpute(impute_method = "min", FDR_treshold = 0.01, truncated = False, triqlerExponential = 2, global_impute = True, maxNaN = 6,
                       PSSS3Input = "/home/ptruong/Git/libvar/data/PSSS3/500-PSSS3-equ decoy_Report_new/500-PSSS3-raw-reformatted_dropna_dropdup_decoy.csv",
                     triqlerInput = "/home/ptruong/Git/libvar/data/PSSS3/500-PSSS3-equ decoy_Report_new/triqlerOutput/20190312_unfiltered/proteins.1vs2.tsv"):
     print("Starting single Impute procedure...")
@@ -616,14 +616,14 @@ def main_singleImpute(impute_method = "min", truncated = False, triqlerExponenti
         print("Global impute: " + str(global_impute))
     print("Processing Spectronaut file: " + PSSS3Input)
     spectronaut =  processSpectronaut(spectronautFile = PSSS3Input,
-                       FDR_treshold = 0.01, impute = impute_method,
+                       FDR_treshold = FDR_treshold, impute = impute_method,
                        global_impute = global_impute)
     
     print("Splitting Spectronaut file by species...")
     at_s, ce_s, hs_s = splitSpectronautBySpecies(spectronaut, truncated = truncated)
     
     print("Processing Triqler file:" + triqlerInput)
-    triqler = processTriqler(triqlerFile = triqlerInput, FDR_treshold = 0.01)
+    triqler = processTriqler(triqlerFile = triqlerInput, FDR_treshold = FDR_treshold)
     print("Splitting Triqler file by species...")
     at_t, ce_t, hs_t = splitTriqlerBySpecies(triqler, exponential = triqlerExponential, truncated = truncated)
     
@@ -741,7 +741,7 @@ def mainMultiImpute(PSSS3Input = "/home/ptruong/Git/libvar/data/PSSS3/500-PSSS3-
     #p_r_plot(unmeltsamp,'A thaliana', "Athaliana_CorrTresh.png")
 """
 
-def mainDiffExp(fileDir, PSSS3Input, impute_method = None, global_impute = True, figName = "plot"):
+def mainDiffExp(fileDir, PSSS3Input, impute_method = None, FDR_treshold = 0.01, global_impute = True, figName = "plot"):
     """
     Generates amount of differential expression plot.
     
@@ -775,7 +775,7 @@ def mainDiffExp(fileDir, PSSS3Input, impute_method = None, global_impute = True,
     #basefig += "_FDR" + str(FDR_treshold).replace(".", "")
     
     df_psss3 = processSpectronaut(spectronautFile = PSSS3Input,
-                                  FDR_treshold = 0.01, impute = impute_method,
+                                  FDR_treshold = FDR_treshold, impute = impute_method,
                                   global_impute = global_impute)
     ###########################
     # DiffExp COMPARISONS #####
