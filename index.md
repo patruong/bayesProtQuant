@@ -23,7 +23,7 @@ Also here is a link to a page [page2](page_2)
 ### 2019-06-19 top3 most intense peptides.
 ![](plots/2019-06-19-top3intense/top3IntensePeptide.png)
 
-PG.Quantity is based on a mix of Top3 intense peptides and reproducibility of identification. What about cases without Top3 intense peptides?
+PG.Quantity is based on a mix of Top3 intense peptides and reproducibility of identification. What about cases without Top3 intense peptides? And how does it account for reproducibility of identification? I guess this should be the C-score (searchScore) in triqler output format.
 
 ![](plots/2019-06-19-top3intense/trashGetsIntoTriqler.png)
 
