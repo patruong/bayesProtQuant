@@ -19,6 +19,27 @@ Also here is a link to a page [page2](page_2)
 ## Tools
 
 ## Project Log
+### 2020-06-20 Differential Expression
+Parameters:
+S02 vs S06
+Triqler parameters: minSamp = 15, log_fold_change = 0.1
+
+Homo Sapiens (S02vS06)
+| Spectronaut (t-test) | Triqler (t-test) | Triqler (reported q-val) |
+|----------------------|------------------|--------------------------|
+| 4711                 | 6350             | 5887                     |
+
+Caenorhabditis elegans (S02vS06)
+| Spectronaut (t-test) | Triqler (t-test) | Triqler (reported q-val) |
+|----------------------|------------------|--------------------------|
+| 213                  | 2461             | 2161                     |
+
+Arabidopsis thaliana (S02vS06)
+| Spectronaut (t-test) | Triqler (t-test) | Triqler (reported q-val) |
+|----------------------|------------------|--------------------------|
+| 4711                 | 6350             | 5887                     |
+
+
 
 ### 2019-06-19 top3 most intense peptides.
 ![](plots/2019-06-19-top3intense/top3IntensePeptide.png)
