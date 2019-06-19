@@ -24,29 +24,23 @@ Parameters:
 S02 vs S06
 Triqler parameters: minSamp = 15, log_fold_change = 0.1
 
-Homo Sapiens (S02vS06)
-
-
-| Spectronaut   | Triqler | Triqler  |
-| ------------- | ------------- | ------------- |
-| Content Cell  | Content Cell  | Content Cell  |
-| Content Cell  | Content Cell  | Content Cell  |
-
 **Homo Sapiens (S02vS06)**
 
-| Spectronaut (t-test) | Triqler (t-test) | Triqler (reported q-val) |
-|----------------------|------------------|--------------------------|
-| 4711                 | 6350             | 5887                     |
+| Spectronaut (t-test) | Triqler (t-test) | Triqler (FC_treshold = 0.1) | Triqler (FC_treshold = 0.8)|Triqler (FC_treshold = 1.2) |
+|----------------------|------------------|--------------------------|--------------------------|--------------------------| 
+| 4711                 | 6350             | 5887                     |                          |                          |
 
-Caenorhabditis elegans (S02vS06)
-| Spectronaut (t-test) | Triqler (t-test) | Triqler (reported q-val) |
-|----------------------|------------------|--------------------------|
-| 213                  | 2461             | 2161                     |
+**Caenorhabditis elegans (S02vS06)**
 
-Arabidopsis thaliana (S02vS06)
-| Spectronaut (t-test) | Triqler (t-test) | Triqler (reported q-val) |
-|----------------------|------------------|--------------------------|
-| 4711                 | 6350             | 5887                     |
+| Spectronaut (t-test) | Triqler (t-test) | Triqler (FC_treshold = 0.1) | Triqler (FC_treshold = 0.8)|Triqler (FC_treshold = 1.2) |
+|----------------------|------------------|--------------------------|--------------------------|--------------------------| 
+| 213                 | 2461             | 2162                     |                          |                          |
+
+**Arabidopsis thaliana (S02vS06)**
+
+| Spectronaut (t-test) | Triqler (t-test) | Triqler (FC_treshold = 0.1) | Triqler (FC_treshold = 0.8)|Triqler (FC_treshold = 1.2) |
+|----------------------|------------------|--------------------------|--------------------------|--------------------------| 
+| 39                 | 22             | 606                     |                          |                          |
 
 
 
