@@ -24,7 +24,8 @@ Parameters:
 S02 vs S06
 Triqler parameters: minSamp = 15, log_fold_change = 0.1
 
-| First Header  | Second Header | Third Header  |
+Homo Sapiens (S02vS06)
+| Spectronaut (t-test)  | Triqler (t-test) | Triqler (reported q-value)  |
 | ------------- | ------------- | ------------- |
 | Content Cell  | Content Cell  | Content Cell  |
 | Content Cell  | Content Cell  | Content Cell  |
