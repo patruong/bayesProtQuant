@@ -33,6 +33,7 @@ Homo Sapiens (S02vS06)
 | Content Cell  | Content Cell  | Content Cell  |
 
 Homo Sapiens (S02vS06)
+
 | Spectronaut (t-test) | Triqler (t-test) | Triqler (reported q-val) |
 |----------------------|------------------|--------------------------|
 | 4711                 | 6350             | 5887                     |
