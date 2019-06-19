@@ -28,19 +28,19 @@ Triqler parameters: minSamp = 15, log_fold_change = 0.1
 
 | Spectronaut (t-test) | Triqler (t-test) | Triqler (FC_treshold = 0.1) | Triqler (FC_treshold = 0.8)|Triqler (FC_treshold = 1.2) |
 |----------------------|------------------|--------------------------|--------------------------|--------------------------| 
-| 4711                 | 6350             | 5887                     |                          |                          |
+| 4711                 | 6350             | 5887                     |   2577                       |   346                       |
 
 **Caenorhabditis elegans (S02vS06)**
 
 | Spectronaut (t-test) | Triqler (t-test) | Triqler (FC_treshold = 0.1) | Triqler (FC_treshold = 0.8)|Triqler (FC_treshold = 1.2) |
 |----------------------|------------------|--------------------------|--------------------------|--------------------------| 
-| 213                 | 2461             | 2162                     |                          |                          |
+| 213                 | 2461             | 2162                     |   886                       |     821                     |
 
 **Arabidopsis thaliana (S02vS06)**
 
 | Spectronaut (t-test) | Triqler (t-test) | Triqler (FC_treshold = 0.1) | Triqler (FC_treshold = 0.8)|Triqler (FC_treshold = 1.2) |
 |----------------------|------------------|--------------------------|--------------------------|--------------------------| 
-| 39                 | 22             | 606                     |                          |                          |
+| 39                 | 22             | 606                     |     0                     |      0                    |
 
 
 
