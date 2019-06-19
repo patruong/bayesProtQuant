@@ -29,6 +29,10 @@ PG.Quantity is based on a mix of Top3 intense peptides and reproducibility of id
 
 If we filter on top3 peptides then some trash, like the 1.0 values seen above gets into Triqler. I need to check the searchScore for these to see how much they impact the posteriors.
 
+![](plots/2019-06-19-top3intense/top3IntensitiesHomoSapSpectronaut.png)
+
+Normalized with protein intensity / sum of proteins intensities. Just taking top 3 intensities does not give a good match at all. This confirms that we are sending a lot of trash into triqler. I am still uncertain if triqler searchScore someone manages to adjust this properly.
+
 ### 2019-06-18 comparison with default settings.
 ![](plots/2019-06-18_init/H_sapiens.png)
 ![](plots/2019-06-18_init/A_thaliana.png)
