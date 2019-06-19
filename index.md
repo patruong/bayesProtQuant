@@ -25,6 +25,10 @@ Also here is a link to a page [page2](page_2)
 
 PG.Quantity is based on a mix of Top3 intense peptides and reproducibility of identification. What about cases without Top3 intense peptides?
 
+![](plots/2019-06-19-top3intense/trashGetsIntoTriqler.png)
+
+If we filter on top3 peptides then some trash, like the 1.0 values seen above gets into Triqler. I need to check the searchScore for these to see how much they impact the posteriors.
+
 ### 2019-06-18 comparison with default settings.
 ![](plots/2019-06-18_init/H_sapiens.png)
 ![](plots/2019-06-18_init/A_thaliana.png)
