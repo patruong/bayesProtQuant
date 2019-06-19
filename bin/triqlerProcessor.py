@@ -8,6 +8,8 @@ Created on Wed Feb 13 13:17:05 2019
 NOTE: Function naming is a bit off... getAbundances and getAllAbundances acutally gets fractions,
 they are used in getFractions() function to get a neat table of fractions.
 
+File should be renamed TriqlerProcessor.py
+
 """
 
 from triqlerParser import * 
@@ -339,7 +341,7 @@ def renameTriqler2Vital(df, keepRuns = False):
 #           'S10:S10_R03', 'S10:S10_R04', 'S10:S10_R05']
     old_cols = df.columns[df.columns.str[:1] == "S"]
     repl_cols_s = old_cols.str[:3].unique()
-    old_cols = ["protein"] + old_cols.tolist()
+    old_cols_prot = ["protein"] + old_cols.tolist()
     if keepRuns == False:
 #        repl_cols_s = ["S01","S02","S03","S04","S05","S06","S07","S08","S09","S10"]        
         cols_allRun = list(np.array([[i,i,i,i,i] for i in repl_cols_s]).flatten())
@@ -347,7 +349,7 @@ def renameTriqler2Vital(df, keepRuns = False):
         #   'protein_id_posterior_error_prob', 'log2_fold_change',
         #   'diff_exp_prob_'+str(diff_exp), 'peptides', 'decoy'], axis = 1).columns
         renameColsMap = dict(zip(old_cols, cols_allRun))
-        df = df[old_cols].set_index(["protein"]).rename(columns = renameColsMap)  
+        df = df[old_cols_prot].set_index(["protein"]).rename(columns = renameColsMap)  
         #df2 = df.drop(["id", "specie", 'q_value', 'posterior_error_prob', 'num_peptides',
         #   'protein_id_posterior_error_prob', 'log2_fold_change',
         #   'diff_exp_prob_'+str(diff_exp), 'peptides', 'decoy'], axis = 1).set_index(["protein"]).rename(columns = renameColsMap)
@@ -360,6 +362,114 @@ def renameTriqler2Vital(df, keepRuns = False):
 #############
 ## PARSERS ##
 #############
+'''    
+def parsePSSS3equDecoy(filename = '500-PSSS3-equ decoy_Report.xls'):
+    """
+    File for parsing PSSS3 unfiltered with decoys and PG.Quantity column. (Very slow)
+    """
+    F = open(filename)
+    
+    header = F.readline().split("\t")[1:8] #not used, only used to skip first row of readin
+    lines = []
+    
+    organisms = ['Arabidopsis thaliana',
+                 'Caenorhabditis elegans OX=6239',
+                 'Homo sapiens']
+    
+    #for i in range(3000):
+    for line in F:    
+        #line = F.readline()
+        element = line.split("\t")[1:8]
+        
+        # Ignore shared proteins
+        if ";" in element[2]:
+            continue
+        
+        reformatted_line = []
+        
+        #lines.append(element)
+        # Make identifier for sample and runs
+        sample = element[0].split("_")[2].split("-")[2]
+        run = element[0].split("_")[-2]
+        run_id = sample + ":" + sample + "_" + run
+        reformatted_line.append(run_id)
+        
+        # Species and Protein
+        if element[1] == organisms[0]:
+            specie = "ARATH"
+        elif element[1] == organisms[1]:
+            specie = "CAEEL"
+        elif element[1] == organisms[2]:
+            specie = "HUMAN"
+        protein = element[2] + "_" + specie
+        reformatted_line.append(protein)
+        
+        # PG.Cscore
+        reformatted_line.append(float(element[3]))
+        
+        # PG.NrOfStrippedSequences
+        reformatted_line.append(float(element[4]))
+        
+        # Q-value
+        reformatted_line.append(float(element[5]))
+        
+        # Protein Quantity
+        reformatted_line.append(float(element[6]))
+        lines.append(reformatted_line)
+    
+    new_header = ["run_id", "protein", "Cscore", "NStrippedSequences", "Qvalue", "ProteinQuantity"]
+    df = pd.DataFrame(lines, columns=new_header)
+    return df
+'''
+#df = psss3.head(1000)
+
+'''
+def parsePSSS3equDecoy(filename = '500-PSSS3-equ decoy_Report.xls'):
+    """
+    File for parsing PSSS3 unfiltered with decoys and PG.Quantity column. (Very slow)
+    """
+    df = pd.read_csv(filename, sep = "\t", usecols = [1,2,3,4,5,6,7,9])
+    df = df.dropna() #dropna from raw file to make processing feasible <--
+    
+    reformatted_df = pd.DataFrame()
+    
+    samples = df["R.FileName"].str.split("-", n=3, expand = True)[2].str.split("_", n=4, expand=True)[0]
+    runs = df["R.FileName"].str.split("-", n=3, expand = True)[2].str.split("_", n=4, expand=True)[2]
+    
+    run_id = samples + ":" + samples + "_" + runs
+    
+    specie = df["PG.Organisms"].apply(lambda x: "CAEEL" if x == "Caenorhabditis elegans OX=6239" 
+             else "ARATH" if x == "Arabidopsis thaliana" else  "HUMAN" if x == 'Homo sapiens' else x)
+    
+    # remove all shared proteins
+    proteinId = df["PG.ProteinAccessions"].apply(lambda x: np.nan if ";" in x else x)
+    
+    protein = proteinId + "_" + specie
+    
+    cScore = df["PG.Cscore"]
+    nrStripped = df["PG.NrOfStrippedSequencesIdentified"]
+    qval = df["PG.Qvalue"]
+    proteinQuantity = df["PG.Quantity"]
+    decoy = df["EG.IsDecoy"]
+    
+    reformatted_df["run_id"] = run_id
+    reformatted_df["protein"] = protein
+    reformatted_df["Cscore"] = cScore
+    reformatted_df["nrStrippedSequences"] = nrStripped
+    reformatted_df["qvalue"] = qval
+    reformatted_df["proteinQuantity"] = proteinQuantity
+    reformatted_df["decoy"] = decoy
+    
+    reformatted_df = reformatted_df.dropna() # Bascially drop all shared proteins. (= NaN from previous row)
+    
+    # Drop duplicates
+    reformatted_df = reformatted_df.drop_duplicates()
+
+    # Sort by run_id
+    # reformatted_df = df.sort_values(by = "run_id")
+
+    return reformatted_df
+'''
 
 def parsePSSS3equDecoy(filename = '500-PSSS3-equ decoy_Report.xls'):
     """

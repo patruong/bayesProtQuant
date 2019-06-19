@@ -341,7 +341,7 @@ def renameTriqler2Vital(df, keepRuns = False):
 #           'S10:S10_R03', 'S10:S10_R04', 'S10:S10_R05']
     old_cols = df.columns[df.columns.str[:1] == "S"]
     repl_cols_s = old_cols.str[:3].unique()
-    old_cols = ["protein"] + old_cols.tolist()
+    old_cols_prot = ["protein"] + old_cols.tolist()
     if keepRuns == False:
 #        repl_cols_s = ["S01","S02","S03","S04","S05","S06","S07","S08","S09","S10"]        
         cols_allRun = list(np.array([[i,i,i,i,i] for i in repl_cols_s]).flatten())
@@ -349,7 +349,7 @@ def renameTriqler2Vital(df, keepRuns = False):
         #   'protein_id_posterior_error_prob', 'log2_fold_change',
         #   'diff_exp_prob_'+str(diff_exp), 'peptides', 'decoy'], axis = 1).columns
         renameColsMap = dict(zip(old_cols, cols_allRun))
-        df = df[old_cols].set_index(["protein"]).rename(columns = renameColsMap)  
+        df = df[old_cols_prot].set_index(["protein"]).rename(columns = renameColsMap)  
         #df2 = df.drop(["id", "specie", 'q_value', 'posterior_error_prob', 'num_peptides',
         #   'protein_id_posterior_error_prob', 'log2_fold_change',
         #   'diff_exp_prob_'+str(diff_exp), 'peptides', 'decoy'], axis = 1).set_index(["protein"]).rename(columns = renameColsMap)
