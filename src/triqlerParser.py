@@ -35,8 +35,14 @@ def readFile(filename):
     f = open(filename, "r")
     f_header = f.readline().replace("\n","").split("\t")
     f_rows = []
+    count = 0
     for i in f:
-        f_row = f.readline().replace("\n","").split("\t") #python 3.6
+        count += 1
+        #print(i)
+        #if count == 10:
+        #    break
+        #f_row = f.readline().replace("\n","").split("\t") #python 3.6
+        f_row = i.replace("\n","").split("\t")
         f_rows.append(f_row)
     return f_header, f_rows
  
