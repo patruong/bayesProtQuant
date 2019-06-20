@@ -69,11 +69,9 @@ Should be
 
 New comparison plots below:
 
-![](plots/2019-06-20_fixedParserBug/HS_plot_minSamp15_logFol1.png)
-
-![](plots/2019-06-20_fixedParserBug/CE_plot_minSamp15_logFol1.png)
-
-![](plots/2019-06-20_fixedParserBug/AT_plot_minSamp15_logFol1.png)
+![](plots/2019-06-20_fixedParserBug/HS_plot_minSamp15_logFold1.png)
+![](plots/2019-06-20_fixedParserBug/CE_plot_minSamp15_logFold1.png)
+![](plots/2019-06-20_fixedParserBug/AT_plot_minSamp15_logFold1.png)
 
 
 ### 2019-06-19 top3 most intense peptides.
