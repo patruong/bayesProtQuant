@@ -42,6 +42,36 @@ Triqler parameters: minSamp = 15
 |----------------------|------------------|--------------------------|--------------------------|--------------------------| 
 | 39                 | 22             | 606                     |     0                     |      0                    |
 
+Fixed bug in triqlerParser.py causing only half the triqler data sets to be read.
+
+```python
+def readFile(filename):
+    """
+    read in filename and return header and rows of the file as lists.
+    """       
+    f = open(filename, "r")
+    f_header = f.readline().replace("\n","").split("\t")
+    f_rows = []
+    for i in f:
+        f_row = f.readline().replace("\n","").split("\t") #python 3.6 # <---- ERROR
+        f_rows.append(f_row)
+    return f_header, f_rows
+```
+Should be 
+
+```python
+...
+    for i in f:
+        f_row = i.replace("\n","").split("\t") #python 3.6 # <---- ERROR
+        f_rows.append(f_row)
+...
+```
+
+New comparison plots below:
+
+![](plots/2019-06-20_fixedParserBug/HS_plot_minSamp15_logFol1.png)
+![](plots/2019-06-20_fixedParserBug/CE_plot_minSamp15_logFol1.png)
+![](plots/2019-06-20_fixedParserBug/AT_plot_minSamp15_logFol1.png)
 
 
 ### 2019-06-19 top3 most intense peptides.
