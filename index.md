@@ -22,23 +22,23 @@ Also here is a link to a page [page2](page_2)
 ### 2020-06-20 Differential Expression
 Parameters:
 S02 vs S06
-Triqler parameters: minSamp = 15, log_fold_change = 0.1
+Triqler parameters: minSamp = 15
 
 **Homo Sapiens (S02vS06)**
 
-| Spectronaut (t-test) | Triqler (t-test) | Triqler (FC_treshold = 0.1) | Triqler (FC_treshold = 0.8)|Triqler (FC_treshold = 1.2) |
+| Spectronaut (t-test) | Triqler (t-test) | Triqler (FC_treshold = 0.1) | Triqler (FC_treshold = 1.0)|Triqler (FC_treshold = 1.2) |
 |----------------------|------------------|--------------------------|--------------------------|--------------------------| 
 | 4711                 | 6350             | 5887                     |   2577                       |   346                       |
 
 **Caenorhabditis elegans (S02vS06)**
 
-| Spectronaut (t-test) | Triqler (t-test) | Triqler (FC_treshold = 0.1) | Triqler (FC_treshold = 0.8)|Triqler (FC_treshold = 1.2) |
+| Spectronaut (t-test) | Triqler (t-test) | Triqler (FC_treshold = 0.1) | Triqler (FC_treshold = 1.0)|Triqler (FC_treshold = 1.2) |
 |----------------------|------------------|--------------------------|--------------------------|--------------------------| 
 | 213                 | 2461             | 2162                     |   886                       |     821                     |
 
 **Arabidopsis thaliana (S02vS06)**
 
-| Spectronaut (t-test) | Triqler (t-test) | Triqler (FC_treshold = 0.1) | Triqler (FC_treshold = 0.8)|Triqler (FC_treshold = 1.2) |
+| Spectronaut (t-test) | Triqler (t-test) | Triqler (FC_treshold = 0.1) | Triqler (FC_treshold = 1.0)|Triqler (FC_treshold = 1.2) |
 |----------------------|------------------|--------------------------|--------------------------|--------------------------| 
 | 39                 | 22             | 606                     |     0                     |      0                    |
 
