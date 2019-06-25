@@ -154,3 +154,70 @@ def generateDiffExpPlot(fileDirectory, df_psss3, FDR_treshold, logSpectronaut, f
             barplotComps(all_df, diffExpTitle, 
                          fileDirectory + "/results/" + specieTitle+'_diffExpPlot'+figName+".png")
 
+from math import sin
+from random import random
+
+from bokeh.io import output_file, show
+
+import bokeh.plotting as bpl
+import bokeh.models as bmo
+
+
+def volcanoProtein(log2fc, log2P, side = "two", fc_treshold = 1.0, 
+                   p_treshold = 0.05, plotWidth = 1000, plotHeight = 1000, title = "Volcano plot of Proteins"):
+    """
+    log2fc - as pandas series with protein names indices.
+    log2P - as pandas series with protein names indices.
+    """
+    # params
+
+    side = "right" #Two or one-sided treshold ("two", "left" or "right")
+    fc_treshold = fc_treshold
+    p_treshold = p_treshold
+    plot_width = plotWidth
+    plot_height = plotHeight
+    title = title
+    log2P_treshold = -np.log2(p_treshold)
+    
+    # Checking data
+    list_x = log2fc.tolist()
+    index_x = log2fc.index
+    list_y = log2P.tolist()
+    index_y = log2P.index
+    if any(index_x != index_y):
+        raise Exception("index mismatch between x and y")
+    df = pd.DataFrame(
+            {
+                    "protein": index_x,
+                    "log2fc": list_x,
+                    "log2P": list_y,
+                    
+            }
+    )
+    if ((side == "r") or (side == "right")):
+        booleandf = (df["log2fc"] > fc_treshold) & (df["log2P"] > log2P_treshold)
+    elif ((side == "l") or (side == "left")):
+        booleandf = (df["log2fc"] < -fc_treshold) & (df["log2P"] > log2P_treshold)
+    elif ((side == "two") or (side == "both")):
+        booleandf_right = ((df["log2fc"] > fc_treshold) & (df["log2P"] > log2P_treshold))
+        booleandf_left = (df["log2fc"] < -fc_treshold) & (df["log2P"] > log2P_treshold)
+        booleandf = pd.DataFrame(np.array([booleandf_right, booleandf_left]).T, columns = ["right", "left"])
+        booleandf = booleandf.any(axis = 1)
+    booleanDictionary = {True: 'red', False: 'blue'}
+    df["color"] = booleandf.map(booleanDictionary)
+    n_diff_expressed = (df["color"] == "red").sum()
+    
+    source = bpl.ColumnDataSource.from_df(df)
+    hover = bmo.HoverTool(tooltips=[
+        ("(log2fc,log2P)", "(@log2fc, @log2P)"),
+        ('protein', '@protein'),
+    ])
+    
+    title += " diffExp proteins: " + str(n_diff_expressed)
+    p = bpl.figure(plot_width=plot_width, plot_height=plot_height, tools=[hover], title=title)
+    
+    p.scatter(
+        'log2fc', 
+        'log2P', source=source, color='color')
+    
+    bpl.show(p)

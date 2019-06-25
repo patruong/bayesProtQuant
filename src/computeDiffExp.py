@@ -14,6 +14,7 @@ from scipy import stats
 import scipy as sp
 from qvalue import *
 from proc import *
+from func import *
 import argparse
 
 
@@ -57,7 +58,7 @@ def main():
 
     args = parser.parse_args()
     if args.subparser_name == "ttest_triqler":
-        n_diffExp = ttest_triqler(triqlerFile = args.input,
+        n_diffExp = diffExp_triqler(triqlerFile = args.input,
                                   protein_id_fdr_treshold = float(args.proteinFDR),
                                   specie = args.specie,
                                   sample1 = args.sample1,
@@ -69,7 +70,7 @@ def main():
         else:
             print("Differentially expressed proteins: " + n_diffExp)
     elif args.subparser_name == "ttest_spectronaut":
-        n_diffExp = ttest_spectronaut(spectronautFile = args.input,
+        n_diffExp = diffExp_spectronaut(spectronautFile = args.input,
                                       protein_id_fdr_treshold = float(args.proteinFDR),
                                       specie = args.specie, 
                                       sample1 = args.sample1,
@@ -150,26 +151,96 @@ def readSpectronaut(spectronautFile, FDR_treshold, impute, global_impute):
         spectronaut = pd.read_pickle(result_spectronaut)
     return spectronaut
 
-def computeDiffExp(sample1, sample2):
-    """
-    t-test differential expression.
-    """
-    if not (sample1.index.tolist() == sample2.index.tolist()):
-        raise Exception("matching error!")
-    pVals = []
-    for i in range(len(sample1)):
-        val1 = sample1.iloc[i].values
-        val1 = val1[np.logical_not(np.isnan(val1))]
-        val2 = sample2.iloc[i].values
-        val2 = val2[np.logical_not(np.isnan(val2))]
-        pVal = stats.ttest_ind(val1, val2).pvalue
-        pVals.append(pVal)
-    pVals = np.array(pVals)
-    prots = sample1.index
-    pVals = pd.DataFrame(pVals, index = prots)#, columns = ["S02"+"_"+"S06"])
+def diffExp_triqler(triqlerFile, protein_id_fdr_treshold, specie, sample1, sample2, fdr_treshold, exponential):
+    if specie not in ["HUMAN", "ARATH", "CAEEL"]:
+        raise Exception ("species should be HUMAN, ARATH or CAEEL!")
+    triqler = readTriqler(triqlerFile, protein_id_fdr_treshold)
+    at_t, ce_t, hs_t = splitTriqlerBySpecies(triqler, exponential = exponential, truncated = False)
+    if specie == "HUMAN":
+        df = hs_t
+    elif specie == "ARATH":
+        df = at_t
+    elif specie == "CAEEL":
+        df = ce_t
+    s1 = df[sample1]
+    s2 = df[sample2]
+    pVals = ttest(s1, s2)
     qVals = qvalues(pVals)
-    return qVals
+    n_diffExp = (qVals < fdr_treshold).sum().values[0]
+    return n_diffExp
 
+def diffExp_spectronaut(spectronautFile, protein_id_fdr_treshold, specie, sample1, sample2, fdr_treshold, impute, global_impute):
+    if specie not in ["HUMAN", "ARATH", "CAEEL"]:
+        raise Exception ("species should be HUMAN, ARATH or CAEEL!")
+    spectronaut = readSpectronaut(spectronautFile = spectronautFile, FDR_treshold = protein_id_fdr_treshold, impute = impute, global_impute = global_impute)
+    at_s, ce_s, hs_s = splitSpectronautBySpecies(spectronaut, truncated = False)
+    if specie == "HUMAN":
+        df = hs_s
+    elif specie == "ARATH":
+        df = at_s
+    elif specie == "CAEEL":
+        df = ce_s
+    s1 = df[sample1]
+    s2 = df[sample2]
+    pVals = ttest(s1, s2)
+    qVals = qvalues(pVals)
+    n_diffExp = (qVals < fdr_treshold).sum().values[0]
+    return n_diffExp
+
+def get_qvalue_diff_exp_triqler(triqler_result, protein_id_fdr, specie, diff_exp_fdr_treshold):
+    """
+    triqler_result = triqler <x>vs<y>.tsv file (e.g. "proteins.2vs6.tsv")
+    protein_id_fdr = protein id fdr tresholding.
+    specie = ["ARATH", "CAEEL", "HUMAN"]
+    """
+    triqler = table2Df(triqler_result, peptideSeperator = True)
+    triqler = triqler2Numeric(triqler)
+    triqler = getTriqlerDetailed(triqler)
+    
+    triqler.sort_values(by = "protein_id_posterior_error_prob", inplace = True)
+    triqler["FDR"] = triqler["protein_id_posterior_error_prob"].expanding().mean()
+    triqler = triqler[triqler["FDR"] < protein_id_fdr]
+    
+    #df_triqler = addSpecieProteinColumns(triqler, startRun = "S01:S01_R01", endRun = "S10:S10_R05")
+    df_triqler = triqler
+    runs = getRuns(triqler, startRun = "S01:S01_R01", endRun = "S10:S10_R05")
+    conditionRuns = getConditionRuns(runs)
+    unique_run = conditionRuns.run.unique()
+    run_id = getConditionRunId(triqler, unique_run[0])
+    
+    n_diffExp = (df_triqler[df_triqler["specie"] == specie].q_value < diff_exp_fdr_treshold).sum().values[0]
+    return n_diffExp
+
+def writeResults(n_diffExp, output_file = "result.csv"):
+    print("Differentially expressed proteins: " + str(n_diffExp))
+    f = open(output_file, "w")
+    f.write("n_diffExp\t"+str(n_diffExp))
+    f.close()
+
+
+triqlerFile = "tmp"
+protein_id_fdr_treshold = 0.01
+
+# Read data
+triqler = readTriqler(triqlerFile, protein_id_fdr_treshold)
+at_t, ce_t, hs_t = splitTriqlerBySpecies(triqler, exponential = False, truncated = False)
+
+#define samples
+sample1 = hs_t["S02"]
+sample2 = hs_t["S06"]
+
+log2fc_vals = get_point_estimate_log2fc(sample1, sample2)
+log2P = compute_log2P(sample1, sample2)
+log2Q = compute_log2Q(sample1, sample2)
+
+if __name__ == "__main__":
+    import warnings
+    warnings.filterwarnings("ignore")
+    main()
+
+
+
+##### JUNK
 """
 triqlerFile = "../data/triqlerOutput_noShared_largeScaleOptimizations_minSamp15/proteins.1vs2.tsv",
              FDR_treshold = 0.01, # Protein ID treshold.
@@ -209,78 +280,6 @@ def readData(triqlerFile = "../data/triqlerOutput_noShared_largeScaleOptimizatio
     at_s, ce_s, hs_s = splitSpectronautBySpecies(spectronaut, truncated = truncated)
     return triqler, spectronaut, at_t, ce_t, hs_t, at_s, ce_s, hs_s
 """
-def ttest_triqler(triqlerFile, protein_id_fdr_treshold, specie, sample1, sample2, fdr_treshold, exponential):
-    if specie not in ["HUMAN", "ARATH", "CAEEL"]:
-        raise Exception ("species should be HUMAN, ARATH or CAEEL!")
-    triqler = readTriqler(triqlerFile, protein_id_fdr_treshold)
-    at_t, ce_t, hs_t = splitTriqlerBySpecies(triqler, exponential = exponential, truncated = False)
-    if specie == "HUMAN":
-        df = hs_t
-    elif specie == "ARATH":
-        df = at_t
-    elif specie == "CAEEL":
-        df = ce_t
-    s1 = df[sample1]
-    s2 = df[sample2]
-    qVals = computeDiffExp(s1, s2)
-    n_diffExp = (qVals < fdr_treshold).sum().values[0]
-    return n_diffExp
-
-def ttest_spectronaut(spectronautFile, protein_id_fdr_treshold, specie, sample1, sample2, fdr_treshold, impute, global_impute):
-    if specie not in ["HUMAN", "ARATH", "CAEEL"]:
-        raise Exception ("species should be HUMAN, ARATH or CAEEL!")
-    spectronaut = readSpectronaut(spectronautFile = spectronautFile, FDR_treshold = protein_id_fdr_treshold, impute = impute, global_impute = global_impute)
-    at_s, ce_s, hs_s = splitSpectronautBySpecies(spectronaut, truncated = False)
-    if specie == "HUMAN":
-        df = hs_s
-    elif specie == "ARATH":
-        df = at_s
-    elif specie == "CAEEL":
-        df = ce_s
-    s1 = df[sample1]
-    s2 = df[sample2]
-    qVals = computeDiffExp(s1, s2)
-    n_diffExp = (qVals < fdr_treshold).sum().values[0]
-    return n_diffExp
-
-def get_qvalue_diff_exp_triqler(triqler_result, protein_id_fdr, specie, diff_exp_fdr_treshold):
-    """
-    triqler_result = triqler <x>vs<y>.tsv file (e.g. "proteins.2vs6.tsv")
-    protein_id_fdr = protein id fdr tresholding.
-    specie = ["ARATH", "CAEEL", "HUMAN"]
-    """
-    triqler = table2Df(triqler_result, peptideSeperator = True)
-    triqler = triqler2Numeric(triqler)
-    triqler = getTriqlerDetailed(triqler)
-    
-    triqler.sort_values(by = "protein_id_posterior_error_prob", inplace = True)
-    triqler["FDR"] = triqler["protein_id_posterior_error_prob"].expanding().mean()
-    triqler = triqler[triqler["FDR"] < protein_id_fdr]
-    
-    #df_triqler = addSpecieProteinColumns(triqler, startRun = "S01:S01_R01", endRun = "S10:S10_R05")
-    df_triqler = triqler
-    runs = getRuns(triqler, startRun = "S01:S01_R01", endRun = "S10:S10_R05")
-    conditionRuns = getConditionRuns(runs)
-    unique_run = conditionRuns.run.unique()
-    run_id = getConditionRunId(triqler, unique_run[0])
-    
-    n_diffExp = (df_triqler[df_triqler["specie"] == specie].q_value < diff_exp_fdr_treshold).sum().values[0]
-    return n_diffExp
-
-def writeResults(n_diffExp, output_file = "result.csv"):
-    print("Differentially expressed proteins: " + str(n_diffExp))
-    f = open(output_file, "w")
-    f.write("n_diffExp\t"+str(n_diffExp))
-    f.close()
-
-if __name__ == "__main__":
-    import warnings
-    warnings.filterwarnings("ignore")
-    main()
-
-
-
-
 
 
 
