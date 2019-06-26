@@ -30,6 +30,8 @@ Converting p-values to q-values should usually lower the amount of significant p
 
 Higher pi0 gives higher q-values and are thus more conservatives and should give less significance.
 
+These experiment can be generated using code in https://github.com/patruong/bayesProtQuant/tree/master/results/2019-06-26_loglogpq (commit  03f3714)
+
 
 
 ### 2020-06-20 Differential Expression
