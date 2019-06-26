@@ -1,5 +1,9 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+
+
 /data
-/results
+/results/plots
 
 /bin/__pycache__/*
 
