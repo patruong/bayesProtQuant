@@ -25,7 +25,12 @@ Also here is a link to a page [page2](page_2)
 ![](https://github.com/patruong/bayesProtQuant/blob/master/results/2019-06-26_loglogpq/pi0_1_hs_t_s02_s06.png)
 ![](https://github.com/patruong/bayesProtQuant/blob/master/results/2019-06-26_loglogpq/hs_t_s02_s06_histogram.png)
 
+
 Converting p-values to q-values should usually lower the amount of significant proteins. Looking at the q-value conversion with pi0 estimates, we can see that at high p- and q-values, there are actually more significant proteins for p-values. The histogram shows that this is because the pi0 estimate is set very low (pi0 = 0.0724). Fixing the pi0 = 1 gives the expected behaviour of less significant proteins at q-value significance.
+
+Higher pi0 gives higher q-values and are thus more conservatives and should give less significance.
+
+
 
 ### 2020-06-20 Differential Expression
 Parameters:
