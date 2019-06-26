@@ -1,0 +1,4 @@
+spectronautFile: ../data/500-PSSS3-raw-reformatted_dropna_dropdup_decoy_nonShared_again.csv
+FDR_treshold: 0.01
+Impute: None
+Global_impute: False

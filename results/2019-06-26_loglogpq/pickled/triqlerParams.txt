@@ -1,0 +1,2 @@
+triqlerFile: ../data/triqlerOutput_noShared_largeScaleOptimizations_minSamp15/proteins.1vs2.tsv
+FDR_treshold: 0.01
