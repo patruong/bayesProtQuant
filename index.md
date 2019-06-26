@@ -19,6 +19,9 @@ Also here is a link to a page [page2](page_2)
 ## Tools
 
 ## Project Log
+### 2020-06-26 loglog plot of p-values vs q-values of triqler results of human S02 v S06
+
+![](https://github.com/patruong/bayesProtQuant/blob/master/results/2019-06-26_loglogpq/pi0_est_hs_t_s02_s06.png)
 ### 2020-06-20 Differential Expression
 Parameters:
 S02 vs S06
