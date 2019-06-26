@@ -162,9 +162,14 @@ from bokeh.io import output_file, show
 import bokeh.plotting as bpl
 import bokeh.models as bmo
 
+def nanAdjustCol(df, booleandf):
+    nandf = (np.isnan(df["log2fc"]) | np.isnan(df["log2P"]))
+    nanDict = {True: np.nan, False: True}
+    nandf = nandf.map(nanDict)
+    booleandf = nandf*booleandf
+    return booleandf
 
-def volcanoProtein(log2fc, log2P, side = "two", fc_treshold = 1.0, 
-                   p_treshold = 0.05, plotWidth = 1000, plotHeight = 1000, title = "Volcano plot of Proteins"):
+def volcano_df_format(log2fc, log2P, side = "two", fc_treshold = 1.0, p_treshold = 0.05, col_diffExp = "red", col_not_diffExp = "blue"):
     """
     log2fc - as pandas series with protein names indices.
     log2P - as pandas series with protein names indices.
@@ -174,9 +179,6 @@ def volcanoProtein(log2fc, log2P, side = "two", fc_treshold = 1.0,
     side = "right" #Two or one-sided treshold ("two", "left" or "right")
     fc_treshold = fc_treshold
     p_treshold = p_treshold
-    plot_width = plotWidth
-    plot_height = plotHeight
-    title = title
     log2P_treshold = -np.log2(p_treshold)
     
     # Checking data
@@ -196,28 +198,44 @@ def volcanoProtein(log2fc, log2P, side = "two", fc_treshold = 1.0,
     )
     if ((side == "r") or (side == "right")):
         booleandf = (df["log2fc"] > fc_treshold) & (df["log2P"] > log2P_treshold)
+        booleandf = nanAdjustCol(df, booleandf)
     elif ((side == "l") or (side == "left")):
         booleandf = (df["log2fc"] < -fc_treshold) & (df["log2P"] > log2P_treshold)
+        booleandf = nanAdjustCol(df, booleandf)
     elif ((side == "two") or (side == "both")):
         booleandf_right = ((df["log2fc"] > fc_treshold) & (df["log2P"] > log2P_treshold))
         booleandf_left = (df["log2fc"] < -fc_treshold) & (df["log2P"] > log2P_treshold)
         booleandf = pd.DataFrame(np.array([booleandf_right, booleandf_left]).T, columns = ["right", "left"])
         booleandf = booleandf.any(axis = 1)
-    booleanDictionary = {True: 'red', False: 'blue'}
+        booleandf = nanAdjustCol(df, booleandf)
+    booleanDictionary = {1: col_diffExp, 0: col_not_diffExp}
     df["color"] = booleandf.map(booleanDictionary)
+    return df
+
+def n_diffExp(log2fc, log2P, side = "two", fc_treshold = 1.0, p_treshold = 0.05):
+    """
+    Computes n differentially expressed from point estimates given log2fc values, log2 p-values, fc_treshold and p_treshold.
+    """
+    df = volcano_df_format(log2fc = log2fc, log2P = log2P, side = side, fc_treshold = fc_treshold, p_treshold = p_treshold)
     n_diff_expressed = (df["color"] == "red").sum()
+    return n_diff_expressed
+
+def n_diffExp_df(df, col_diffExp):
+    n_diff_expressed = (df["color"] == col_diffExp).sum()
+    return df
+
+def volcanoPlot(df, plotWidth = 1000, plotHeight = 1000, title = "Volcano plot of Proteins"):
+    plot_width = plotWidth
+    plot_height = plotHeight
+    title = title
     
     source = bpl.ColumnDataSource.from_df(df)
     hover = bmo.HoverTool(tooltips=[
         ("(log2fc,log2P)", "(@log2fc, @log2P)"),
         ('protein', '@protein'),
     ])
-    
-    title += " diffExp proteins: " + str(n_diff_expressed)
     p = bpl.figure(plot_width=plot_width, plot_height=plot_height, tools=[hover], title=title)
-    
     p.scatter(
         'log2fc', 
         'log2P', source=source, color='color')
-    
     bpl.show(p)

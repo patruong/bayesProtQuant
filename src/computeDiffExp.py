@@ -94,67 +94,10 @@ def main():
     elif args.subparser_name == "removePickle":
         removePickle()
 
-def removePickle():
-    """
-    Need to remove Pickle to use other parameters!
-    """
-    if not Path("pickled").exists():
-        raise Exception ("No pickled folder exists!")
-    answ = input("Delete pickled folder with contents? [Y/n]")
-    while True:
-        if answ == "Y":
-            shutil.rmtree("pickled")
-        elif answ == "n":
-            break
-        else:
-            print("Y (delete) or n (don't delete)...")
-    
-def readTriqler(triqlerFile, FDR_treshold):
-    result_triqler = Path("pickled/triqler.pkl")
-    if not result_triqler.exists():
-        triqler = processTriqler(triqlerFile = triqlerFile, FDR_treshold = FDR_treshold)
-        if not Path("pickled").exists():
-            os.mkdir("pickled")
-        triqler.to_pickle("pickled/triqler.pkl")
-        pickle_params = open("pickled/triqlerParams.txt", "w")
-        pickle_params.write("triqlerFile: " + triqlerFile + "\n")
-        pickle_params.write("FDR_treshold: " + str(FDR_treshold) + "\n")
-        pickle_params.close()
-    else:
-        f = open("pickled/triqlerParams.txt", "r")
-        print("Reading pickled Triqler...")
-        print("Triqler parameters")
-        for i in f:
-            print(i,  end = "")
-        triqler = pd.read_pickle(result_triqler)
-    return triqler 
-
-def readSpectronaut(spectronautFile, FDR_treshold, impute, global_impute):
-    result_spectronaut = Path("pickled/spectronaut.pkl")
-    if not result_spectronaut.exists():
-        spectronaut = processSpectronaut(spectronautFile = spectronautFile, FDR_treshold = FDR_treshold, impute = impute, global_impute = global_impute)
-        if not Path("pickled").exists():
-            os.mkdir("pickled")
-        pickle_params = open("pickled/spectronautParams.txt", "w")
-        pickle_params.write("spectronautFile: " + spectronautFile + "\n")
-        pickle_params.write("FDR_treshold: " + str(FDR_treshold) + "\n")
-        pickle_params.write("Impute: " + str(impute) + "\n")
-        pickle_params.write("Global_impute: " + str(global_impute))
-        pickle_params.close()
-        spectronaut.to_pickle("pickled/spectronaut.pkl")
-    else:
-        f = open("pickled/spectronautParams.txt", "r")
-        print("Reading pickled Spectronaut...")
-        print("Spectronaut parameters")
-        for i in f:
-            print(i, end = "")
-        spectronaut = pd.read_pickle(result_spectronaut)
-    return spectronaut
-
 def diffExp_triqler(triqlerFile, protein_id_fdr_treshold, specie, sample1, sample2, fdr_treshold, exponential):
     if specie not in ["HUMAN", "ARATH", "CAEEL"]:
         raise Exception ("species should be HUMAN, ARATH or CAEEL!")
-    triqler = readTriqler(triqlerFile, protein_id_fdr_treshold)
+    triqler = read_pickle_Triqler(triqlerFile, protein_id_fdr_treshold)
     at_t, ce_t, hs_t = splitTriqlerBySpecies(triqler, exponential = exponential, truncated = False)
     if specie == "HUMAN":
         df = hs_t
@@ -172,7 +115,7 @@ def diffExp_triqler(triqlerFile, protein_id_fdr_treshold, specie, sample1, sampl
 def diffExp_spectronaut(spectronautFile, protein_id_fdr_treshold, specie, sample1, sample2, fdr_treshold, impute, global_impute):
     if specie not in ["HUMAN", "ARATH", "CAEEL"]:
         raise Exception ("species should be HUMAN, ARATH or CAEEL!")
-    spectronaut = readSpectronaut(spectronautFile = spectronautFile, FDR_treshold = protein_id_fdr_treshold, impute = impute, global_impute = global_impute)
+    spectronaut = read_pickle_Spectronaut(spectronautFile = spectronautFile, FDR_treshold = protein_id_fdr_treshold, impute = impute, global_impute = global_impute)
     at_s, ce_s, hs_s = splitSpectronautBySpecies(spectronaut, truncated = False)
     if specie == "HUMAN":
         df = hs_s
@@ -221,13 +164,37 @@ def writeResults(n_diffExp, output_file = "result.csv"):
 triqlerFile = "tmp"
 protein_id_fdr_treshold = 0.01
 
+
+########
+# tmp ##
+########
+
 # Read data
-triqler = readTriqler(triqlerFile, protein_id_fdr_treshold)
+triqler = read_pickle_Triqler(triqlerFile, protein_id_fdr_treshold)
 at_t, ce_t, hs_t = splitTriqlerBySpecies(triqler, exponential = False, truncated = False)
 
 #define samples
 sample1 = hs_t["S02"]
 sample2 = hs_t["S06"]
+
+log2fc_vals = get_point_estimate_log2fc(sample1, sample2)
+log2P = compute_log2P(sample1, sample2)
+log2Q = compute_log2Q(sample1, sample2)
+
+########
+# tmp2 #
+########
+
+# Read data
+spectronautFile = "tmp"
+protein_id_fdr_treshold = 0.01
+
+spectronaut =  read_pickle_Spectronaut(spectronautFile, protein_id_fdr_treshold, impute = None, global_impute = True)
+at_s, ce_s, hs_s = splitSpectronautBySpecies(spectronaut, truncated = False)
+
+#define samples
+sample1 = hs_s["S02"]
+sample2 = hs_s["S06"]
 
 log2fc_vals = get_point_estimate_log2fc(sample1, sample2)
 log2P = compute_log2P(sample1, sample2)
@@ -274,8 +241,8 @@ def readData(triqlerFile = "../data/triqlerOutput_noShared_largeScaleOptimizatio
              spectronautFile = "../data/500-PSSS3-raw-reformatted_dropna_dropdup_decoy_nonShared_again.csv",
              impute = None,
              global_impute = False):     
-    triqler = readTriqler(triqlerFile = triqlerFile, FDR_treshold = FDR_treshold)
-    spectronaut = readSpectronaut(spectronautFile = spectronautFile, FDR_treshold = FDR_treshold, impute = impute, global_impute = global_impute)
+    triqler = read_pickle_Triqler(triqlerFile = triqlerFile, FDR_treshold = FDR_treshold)
+    spectronaut = read_pickle_Spectronaut(spectronautFile = spectronautFile, FDR_treshold = FDR_treshold, impute = impute, global_impute = global_impute)
     at_t, ce_t, hs_t = splitTriqlerBySpecies(triqler, exponential = exponential, truncated = truncated)
     at_s, ce_s, hs_s = splitSpectronautBySpecies(spectronaut, truncated = truncated)
     return triqler, spectronaut, at_t, ce_t, hs_t, at_s, ce_s, hs_s
