@@ -21,7 +21,7 @@ Also here is a link to a page [page2](page_2)
 ## Project Log
 ### 2020-06-27 fixing the 1.0 intensity error in PSSS3 data set for triqler.
 
-
+[page2](page_2)
 
 ### 2020-06-26 loglog plot of p-values vs q-values of triqler results of human S02 v S06
 
