@@ -14,7 +14,7 @@
 [Members]()
 [Project Log]()
 
-Also here is a link to a page [page2](page_2)
+Also here is a link to a page [page2](pages/check_1_intensity.md)
 ## Project description
 ## Tools
 
