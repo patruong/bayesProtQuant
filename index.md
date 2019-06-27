@@ -14,14 +14,16 @@
 [Members]()
 [Project Log]()
 
-Also here is a link to a page [page2](pages/check_1_intensity.md)
+Also here is a link to a page [page2](page2)
 ## Project description
 ## Tools
 
 ## Project Log
 ### 2020-06-27 fixing the 1.0 intensity error in PSSS3 data set for triqler.
 
-[page2](page_2)
+[Here is a link to a short analysis of the 1.0 intensities](pages/check_1_intensity.md)
+
+ToDo: if not "decoy" suffix in triqlerFormatted data: if intensity == 0 => Drop by setting the intensities to 0.0.
 
 ### 2020-06-26 loglog plot of p-values vs q-values of triqler results of human S02 v S06
 
