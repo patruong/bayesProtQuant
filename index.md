@@ -25,7 +25,7 @@ Also here is a link to a page [page2](page_2)
 
 ### 2020-06-26 loglog plot of p-values vs q-values of triqler results of human S02 v S06
 
-![](results/2019-06-26_loglogpq/pi0_est_hs_t_s02_s06.png)
+![](../results/2019-06-26_loglogpq/pi0_est_hs_t_s02_s06.png)
 ![](https://github.com/patruong/bayesProtQuant/blob/master/results/2019-06-26_loglogpq/pi0_1_hs_t_s02_s06.png)
 ![](https://github.com/patruong/bayesProtQuant/blob/master/results/2019-06-26_loglogpq/hs_t_s02_s06_histogram.png)
 
