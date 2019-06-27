@@ -456,13 +456,13 @@ def adjustNonShared(libraryDirectory = "library/LKaell/",
 #########################################
 # PICKLE USED IN computeDiffExp script ##
 #########################################
-def removePickle():
+def removePickle(pickle_path = "pickled"):
     """
     Need to remove Pickle to use other parameters!
     """
-    if not Path("pickled").exists():
+    if not Path(pickle_path).exists():
         raise Exception ("No pickled folder exists!")
-    answ = input("Delete pickled folder with contents? [Y/n]")
+    answ = input("Delete pickled folder " +"(" + str(Path(pickle_path))+ ")" + " with contents? [Y/n]")
     while True:
         if answ == "Y":
             shutil.rmtree("pickled")
@@ -471,19 +471,19 @@ def removePickle():
         else:
             print("Y (delete) or n (don't delete)...")
             
-def read_pickle_Triqler(triqlerFile, protein_id_fdr_treshold):
-    result_triqler = Path("pickled/triqler.pkl")
+def read_pickle_Triqler(triqlerFile, protein_id_fdr_treshold, pickle_path = "../data/pickled/"):
+    result_triqler = Path(pickle_path + "triqler.pkl")
     if not result_triqler.exists():
         triqler = processTriqler(triqlerFile = triqlerFile, FDR_treshold = protein_id_fdr_treshold)
-        if not Path("pickled").exists():
-            os.mkdir("pickled")
-        triqler.to_pickle("pickled/triqler.pkl")
-        pickle_params = open("pickled/triqlerParams.txt", "w")
+        if not Path(pickle_path).exists():
+            os.mkdir(pickle_path)
+        triqler.to_pickle(pickle_path + "triqler.pkl")
+        pickle_params = open(pickle_path + "triqlerParams.txt", "w")
         pickle_params.write("triqlerFile: " + triqlerFile + "\n")
         pickle_params.write("protein_id_fdr_treshold: " + str(protein_id_fdr_treshold) + "\n")
         pickle_params.close()
     else:
-        f = open("pickled/triqlerParams.txt", "r")
+        f = open(pickle_path + "triqlerParams.txt", "r")
         print("Reading pickled Triqler...")
         print("Triqler parameters")
         for i in f:
@@ -491,21 +491,21 @@ def read_pickle_Triqler(triqlerFile, protein_id_fdr_treshold):
         triqler = pd.read_pickle(result_triqler)
     return triqler 
 
-def read_pickle_Spectronaut(spectronautFile, protein_id_fdr_treshold, impute, global_impute):
-    result_spectronaut = Path("pickled/spectronaut.pkl")
+def read_pickle_Spectronaut(spectronautFile, protein_id_fdr_treshold, impute, global_impute, pickle_path = "../data/pickled/"):
+    result_spectronaut = Path(pickle_path + "spectronaut.pkl")
     if not result_spectronaut.exists():
         spectronaut = processSpectronaut(spectronautFile = spectronautFile, FDR_treshold = protein_id_fdr_treshold, impute = impute, global_impute = global_impute)
-        if not Path("pickled").exists():
-            os.mkdir("pickled")
-        pickle_params = open("pickled/spectronautParams.txt", "w")
+        if not Path(pickle_path).exists():
+            os.mkdir(pickle_path)
+        pickle_params = open(pickle_path + "spectronautParams.txt", "w")
         pickle_params.write("spectronautFile: " + spectronautFile + "\n")
         pickle_params.write("protein_id_fdr_treshold: " + str(protein_id_fdr_treshold) + "\n")
         pickle_params.write("Impute: " + str(impute) + "\n")
         pickle_params.write("Global_impute: " + str(global_impute))
         pickle_params.close()
-        spectronaut.to_pickle("pickled/spectronaut.pkl")
+        spectronaut.to_pickle(pickle_path + "spectronaut.pkl")
     else:
-        f = open("pickled/spectronautParams.txt", "r")
+        f = open(pickle_path + "spectronautParams.txt", "r")
         print("Reading pickled Spectronaut...")
         print("Spectronaut parameters")
         for i in f:

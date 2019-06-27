@@ -62,6 +62,18 @@ def compute_log2P(sample1, sample2):
     log2P = -np.log2(pVals)
     return log2P
 
+# Compute -log10(p)
+def compute_log10P(sample1, sample2):
+    pVals = ttest(sample1, sample2)
+    log10P = -np.log10(pVals)
+    return log10P
+
+# Compute -log(p)
+def compute_logP(sample1, sample2, logFunc = np.log10):
+    pVals = ttest(sample1, sample2)
+    logP = -logFunc(pVals)
+    return logP
+
 # Compute -log2(q)
 def compute_log2Q(sample1, sample2):
     pVals = compute_log2P(sample1, sample2)    

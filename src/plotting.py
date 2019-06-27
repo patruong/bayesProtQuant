@@ -169,7 +169,7 @@ def nanAdjustCol(df, booleandf):
     booleandf = nandf*booleandf
     return booleandf
 
-def volcano_df_format(log2fc, log2P, side = "two", fc_treshold = 1.0, p_treshold = 0.05, col_diffExp = "red", col_not_diffExp = "blue"):
+def volcano_df_format(log2fc, log2P, logFunc = np.log2, side = "two", fc_treshold = 1.0, p_treshold = 0.05, col_diffExp = "red", col_not_diffExp = "blue"):
     """
     log2fc - as pandas series with protein names indices.
     log2P - as pandas series with protein names indices.
@@ -179,7 +179,7 @@ def volcano_df_format(log2fc, log2P, side = "two", fc_treshold = 1.0, p_treshold
     side = side #Two or one-sided treshold ("two", "left" or "right")
     fc_treshold = fc_treshold
     p_treshold = p_treshold
-    log2P_treshold = -np.log2(p_treshold)
+    logP_treshold = -logFunc(p_treshold)
     
     # Checking data
     list_x = log2fc.tolist()
@@ -198,16 +198,16 @@ def volcano_df_format(log2fc, log2P, side = "two", fc_treshold = 1.0, p_treshold
     )
     if ((side == "r") or (side == "right")):
         print("Right sided fc treshold.")
-        booleandf = (df["log2fc"] > fc_treshold) & (df["log2P"] > log2P_treshold)
+        booleandf = (df["log2fc"] > fc_treshold) & (df["log2P"] > logP_treshold)
         booleandf = nanAdjustCol(df, booleandf)
     elif ((side == "l") or (side == "left")):
         print("Left sided fc treshold.")
-        booleandf = (df["log2fc"] < -fc_treshold) & (df["log2P"] > log2P_treshold)
+        booleandf = (df["log2fc"] < -fc_treshold) & (df["log2P"] > logP_treshold)
         booleandf = nanAdjustCol(df, booleandf)
     elif ((side == "two") or (side == "both")):
         print("Two sided fc treshold.")
-        booleandf_right = ((df["log2fc"] > fc_treshold) & (df["log2P"] > log2P_treshold))
-        booleandf_left = (df["log2fc"] < -fc_treshold) & (df["log2P"] > log2P_treshold)
+        booleandf_right = ((df["log2fc"] > fc_treshold) & (df["log2P"] > logP_treshold))
+        booleandf_left = (df["log2fc"] < -fc_treshold) & (df["log2P"] > logP_treshold)
         booleandf = pd.DataFrame(np.array([booleandf_right, booleandf_left]).T, columns = ["right", "left"])
         booleandf = booleandf.any(axis = 1)
         booleandf = nanAdjustCol(df, booleandf)
@@ -227,10 +227,12 @@ def n_diffExp_df(df, col_diffExp):
     n_diff_expressed = (df["color"] == col_diffExp).sum()
     return df
 
-def volcanoPlot(df, plotWidth = 1000, plotHeight = 1000, x_label = "x-label", y_label = "y-label", title = "Volcano plot of Proteins", outputFile = None):
+def volcanoPlot(df, vertical_line_r = None, vertical_line_l = None, horizontal_line = None,  plotWidth = 1000, plotHeight = 1000, x_label = "x-label", y_label = "y-label", title = "Volcano plot of Proteins", outputFile = None):
     plot_width = plotWidth
     plot_height = plotHeight
     title = title
+    
+    
     
     source = bpl.ColumnDataSource.from_df(df)
     hover = bmo.HoverTool(tooltips=[
@@ -240,6 +242,19 @@ def volcanoPlot(df, plotWidth = 1000, plotHeight = 1000, x_label = "x-label", y_
     p = bpl.figure(plot_width=plot_width, plot_height=plot_height, tools=[hover], title=title,
                    x_axis_label= x_label,
                    y_axis_label= y_label)
+    
+    # Vertical line
+    if vertical_line_r != None:
+        vline_r = bmo.Span(location=vertical_line_r, dimension='height', line_color='red', line_dash = "dashed", line_width=1, line_alpha = 0.8)
+        p.renderers.extend([vline_r])
+    if vertical_line_l != None:
+        vline_l = bmo.Span(location=vertical_line_l, dimension='height', line_color='red', line_dash = "dashed", line_width=1, line_alpha = 0.8)
+        p.renderers.extend([vline_l])
+    # Horizontal line
+    if horizontal_line != None:
+        hline = bmo.Span(location=horizontal_line, dimension='width', line_color='red', line_dash = "dashed", line_width=1, line_alpha = 0.8)
+        p.renderers.extend([hline])
+    
     p.scatter(
         'log2fc', 
         'log2P', source=source, color='color')
@@ -248,7 +263,7 @@ def volcanoPlot(df, plotWidth = 1000, plotHeight = 1000, x_label = "x-label", y_
     bpl.show(p)
 
 
-def volcanoPlot_spectronaut_triqler(df1, df2, plot_width = 1000, plot_height = 1000, title = "plot", x_label = "xlabel", y_label = "ylabel", outputFile = None):
+def volcanoPlot_spectronaut_triqler(df1, df2, vertical_line_r = None, vertical_line_l = None, horizontal_line = None, plot_width = 1000, plot_height = 1000, title = "plot", x_label = "xlabel", y_label = "ylabel", outputFile = None):
     plot_width = plot_width
     plot_height = plot_height
     title = title
@@ -257,6 +272,18 @@ def volcanoPlot_spectronaut_triqler(df1, df2, plot_width = 1000, plot_height = 1
         ('protein', '@protein'),
     ])    
     p = bpl.figure(plot_width=plot_width, plot_height=plot_height, tools=[hover], title=title, x_axis_label= x_label, y_axis_label= y_label)
+    
+    # Vertical line
+    if vertical_line_r != None:
+        vline_r = bmo.Span(location=vertical_line_r, dimension='height', line_color='red', line_dash = "dashed", line_width=1, line_alpha = 0.8)
+        p.renderers.extend([vline_r])
+    if vertical_line_l != None:
+        vline_l = bmo.Span(location=vertical_line_l, dimension='height', line_color='red', line_dash = "dashed", line_width=1, line_alpha = 0.8)
+        p.renderers.extend([vline_l])
+    # Horizontal line
+    if horizontal_line != None:
+        hline = bmo.Span(location=horizontal_line, dimension='width', line_color='red', line_dash = "dashed", line_width=1, line_alpha = 0.8)
+        p.renderers.extend([hline])
     
     for data, name in zip([df1, df2], ["Triqler", "Spectronaut"]):
         df = pd.DataFrame(data)

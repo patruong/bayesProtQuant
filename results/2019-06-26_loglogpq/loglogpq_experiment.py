@@ -46,14 +46,14 @@ def qvalues(pvalues, pi0):
     return qs, pi0
 
 
-def use_triqler_samples(s1, s2):
+def use_triqler_samples(s1, s2, pickle_path = "../data/pickled/"):
     """
     s1, s2 = S01, ..., S10.
     """
     triqlerFile = "tmp"
     protein_id_fdr_treshold = 0.01
     # Read data
-    triqler = read_pickle_Triqler(triqlerFile, protein_id_fdr_treshold)
+    triqler = read_pickle_Triqler(triqlerFile, protein_id_fdr_treshold, pickle_path)
     at_t, ce_t, hs_t = splitTriqlerBySpecies(triqler, exponential = False, truncated = False)
     
     #define samples
@@ -61,13 +61,13 @@ def use_triqler_samples(s1, s2):
     sample2 = hs_t[s2]
     return sample1, sample2
 
-def use_spectronaut_samples(s1,s2):
+def use_spectronaut_samples(s1,s2, pickle_path = "../data/pickled/"):
         
     # Read data
     spectronautFile = "tmp"
     protein_id_fdr_treshold = 0.01
     
-    spectronaut =  read_pickle_Spectronaut(spectronautFile, protein_id_fdr_treshold, impute = None, global_impute = True)
+    spectronaut =  read_pickle_Spectronaut(spectronautFile, protein_id_fdr_treshold, impute = None, global_impute = True, , pickle_path = "../data/pickled/")
     at_s, ce_s, hs_s = splitSpectronautBySpecies(spectronaut, truncated = False)
     
     #define samples
@@ -98,8 +98,9 @@ def plot_pVals_hist(sample1, sample2, n_bins = 100):
     pVals.hist(bins = n_bins)
 
 if __name__ == "__main__":
-    sample1, sample2 = use_triqler_samples("S02", "S06")
-    #sample1, sample2 = use_spectronaut_samples("S02", "S06")
+    pickled_path = "../data/pickled/"
+    sample1, sample2 = use_triqler_samples("S02", "S06", pickled_path)
+    #sample1, sample2 = use_spectronaut_samples("S02", "S06", pickled_path)
     plot_loglog_pq(sample1, sample2, pi0 = 1, title = "Human S02 v S06 triqler")
     plot_loglog_pq(sample1, sample2, pi0 = "est", title = "Human S02 v S06 triqler")
     plot_pVals_hist(sample1, sample2, n_bins = 100)
