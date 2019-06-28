@@ -44,9 +44,12 @@ log2fc_vals = log2fc_vals.reindex(index = logFDR.index)
 n = 10000 #each p takes ~3s and q takes ~17s
 fdrs = np.linspace(0,1, n+1)
 count = 0
+diffExp_array = np.array([])
+
 for fdr in fdrs:  
     print(str(count) + " of " + str(len(fdrs)) + " bins.")
     df_volcano_format = volcano_df_format(log2fc_vals, logFDR, logFunc = logFunc, side = side, fc_treshold = fc_treshold, p_treshold =  fdr, col_diffExp = col_diffExp, col_not_diffExp = col_not_diffExp)
     n_diffExp = n_diffExp_df(df_volcano_format, col_diffExp)
+    diffExp_array = np.append(diffExp_array, n_diffExp)
     count += 1
 
