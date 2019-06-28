@@ -163,7 +163,7 @@ import bokeh.plotting as bpl
 import bokeh.models as bmo
 
 def nanAdjustCol(df, booleandf):
-    nandf = (np.isnan(df["log2fc"]) | np.isnan(df["log2P"]))
+    nandf = (np.isnan(df["log2fc"]) | np.isnan(df["logFDR"]))
     nanDict = {True: np.nan, False: True}
     nandf = nandf.map(nanDict)
     booleandf = nandf*booleandf
@@ -192,22 +192,22 @@ def volcano_df_format(log2fc, log2P, logFunc = np.log2, side = "two", fc_treshol
             {
                     "protein": index_x,
                     "log2fc": list_x,
-                    "log2P": list_y,
+                    "logFDR": list_y,
                     
             }
     )
     if ((side == "r") or (side == "right")):
         print("Right sided fc treshold.")
-        booleandf = (df["log2fc"] > fc_treshold) & (df["log2P"] > logP_treshold)
+        booleandf = (df["log2fc"] > fc_treshold) & (df["logFDR"] > logP_treshold)
         booleandf = nanAdjustCol(df, booleandf)
     elif ((side == "l") or (side == "left")):
         print("Left sided fc treshold.")
-        booleandf = (df["log2fc"] < -fc_treshold) & (df["log2P"] > logP_treshold)
+        booleandf = (df["log2fc"] < -fc_treshold) & (df["logFDR"] > logP_treshold)
         booleandf = nanAdjustCol(df, booleandf)
     elif ((side == "two") or (side == "both")):
         print("Two sided fc treshold.")
-        booleandf_right = ((df["log2fc"] > fc_treshold) & (df["log2P"] > logP_treshold))
-        booleandf_left = (df["log2fc"] < -fc_treshold) & (df["log2P"] > logP_treshold)
+        booleandf_right = ((df["log2fc"] > fc_treshold) & (df["logFDR"] > logP_treshold))
+        booleandf_left = (df["log2fc"] < -fc_treshold) & (df["logFDR"] > logP_treshold)
         booleandf = pd.DataFrame(np.array([booleandf_right, booleandf_left]).T, columns = ["right", "left"])
         booleandf = booleandf.any(axis = 1)
         booleandf = nanAdjustCol(df, booleandf)
@@ -215,17 +215,7 @@ def volcano_df_format(log2fc, log2P, logFunc = np.log2, side = "two", fc_treshol
     df["color"] = booleandf.map(booleanDictionary)
     return df
 
-def n_diffExp(log2fc, log2P, side = "two", fc_treshold = 1.0, p_treshold = 0.05):
-    """
-    Computes n differentially expressed from point estimates given log2fc values, log2 p-values, fc_treshold and p_treshold.
-    """
-    df = volcano_df_format(log2fc = log2fc, log2P = log2P, side = side, fc_treshold = fc_treshold, p_treshold = p_treshold)
-    n_diff_expressed = (df["color"] == "red").sum()
-    return n_diff_expressed
 
-def n_diffExp_df(df, col_diffExp):
-    n_diff_expressed = (df["color"] == col_diffExp).sum()
-    return df
 
 def volcanoPlot(df, vertical_line_r = None, vertical_line_l = None, horizontal_line = None,  plotWidth = 1000, plotHeight = 1000, x_label = "x-label", y_label = "y-label", title = "Volcano plot of Proteins", outputFile = None):
     plot_width = plotWidth
@@ -236,10 +226,12 @@ def volcanoPlot(df, vertical_line_r = None, vertical_line_l = None, horizontal_l
     
     source = bpl.ColumnDataSource.from_df(df)
     hover = bmo.HoverTool(tooltips=[
-        ("(log2fc,log2P)", "(@log2fc, @log2P)"),
+        ("(log2fc,logFDR)", "(@log2fc, @logFDR)"),
         ('protein', '@protein'),
     ])
-    p = bpl.figure(plot_width=plot_width, plot_height=plot_height, tools=[hover], title=title,
+    boxSelect = bmo.BoxSelectTool()
+    p = bpl.figure(plot_width=plot_width, plot_height=plot_height, tools=[hover, boxSelect], 
+                   title=title,
                    x_axis_label= x_label,
                    y_axis_label= y_label)
     
@@ -257,7 +249,7 @@ def volcanoPlot(df, vertical_line_r = None, vertical_line_l = None, horizontal_l
     
     p.scatter(
         'log2fc', 
-        'log2P', source=source, color='color')
+        'logFDR', source=source, color='color')
     if outputFile != None:
         bpl.output_file(outputFile)
     bpl.show(p)
@@ -268,10 +260,11 @@ def volcanoPlot_spectronaut_triqler(df1, df2, vertical_line_r = None, vertical_l
     plot_height = plot_height
     title = title
     hover = bmo.HoverTool(tooltips=[
-        ("(log2fc,log2P)", "(@log2fc, @log2P)"),
+        ("(log2fc,logFDR)", "(@log2fc, @logFDR)"),
         ('protein', '@protein'),
     ])    
-    p = bpl.figure(plot_width=plot_width, plot_height=plot_height, tools=[hover], title=title, x_axis_label= x_label, y_axis_label= y_label)
+    boxSelect = bmo.BoxSelectTool()    
+    p = bpl.figure(plot_width=plot_width, plot_height=plot_height, tools=[hover, boxSelect], title=title, x_axis_label= x_label, y_axis_label= y_label)
     
     # Vertical line
     if vertical_line_r != None:
@@ -290,7 +283,7 @@ def volcanoPlot_spectronaut_triqler(df1, df2, vertical_line_r = None, vertical_l
         
         source = bpl.ColumnDataSource.from_df(df)
 
-        p.scatter('log2fc', 'log2P', source=source, color='color', alpha=0.8,
+        p.scatter('log2fc', 'logFDR', source=source, color='color', alpha=0.8,
                muted_color='color', muted_alpha=0.05, legend=name)
     p.legend.location = "top_left"
     p.legend.click_policy="mute"

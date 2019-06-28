@@ -76,8 +76,32 @@ def compute_logP(sample1, sample2, logFunc = np.log10):
 
 # Compute -log2(q)
 def compute_log2Q(sample1, sample2):
-    pVals = compute_log2P(sample1, sample2)    
+    pVals = ttest(sample1, sample2)    
     qVals = qvalues(pVals)
     qVals = qVals.apply(pd.to_numeric)
     log2Q = -np.log2(qVals["q"])
     return log2Q
+
+def compute_logQ(sample1, sample2, logFunc = np.log10):
+    pVals = ttest(sample1, sample2)    
+    qVals = qvalues(pVals)
+    qVals = qVals.apply(pd.to_numeric)
+    log2Q = -logFunc(qVals["q"])
+    return log2Q
+
+#############################################################
+# Functions relating to plotting format and plotting module #
+#############################################################
+    
+
+def n_diffExp(log2fc, log2P, side = "two", fc_treshold = 1.0, p_treshold = 0.05):
+    """
+    Computes n differentially expressed from point estimates given log2fc values, log2 p-values, fc_treshold and p_treshold.
+    """
+    df = volcano_df_format(log2fc = log2fc, log2P = log2P, side = side, fc_treshold = fc_treshold, p_treshold = p_treshold)
+    n_diff_expressed = (df["color"] == "red").sum()
+    return n_diff_expressed
+
+def n_diffExp_df(df, col_diffExp):
+    n_diff_expressed = (df["color"] == col_diffExp).sum()
+    return n_diff_expressed
