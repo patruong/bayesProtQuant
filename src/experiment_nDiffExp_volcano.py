@@ -33,44 +33,20 @@ def getSpectronaut_pickle(spectronautFile, protein_id_fdr_treshold, impute = Non
     at_s, ce_s, hs_s = splitSpectronautBySpecies(spectronaut, truncated = False)
     return spectronaut, at_s, ce_s, hs_s
 
-def compute_nDiff_exp(sample1, sample2, fc_treshold = 1.0, fdr_treshold = 0.05, compute_FDR = compute_logQ, col_diffExp = "red", col_not_diffExp = "blue"):
-    """
-    eg. 
-    df = hs_t
-    sample1 = df[s1]
-    sample2 = df[s2]
-    """
-    log2fc_vals = get_point_estimate_log2fc(sample1, sample2)
-    logFDR = compute_FDR(sample1, sample2, logFunc)
-    logFDR = logFDR.squeeze()
-    log2fc_vals = log2fc_vals.reindex(index = logFDR.index)
-    df_volcano_format = volcano_df_format(log2fc_vals, logFDR, logFunc = logFunc, side = side, fc_treshold = fc_treshold, p_treshold =  fdr_treshold, col_diffExp = col_diffExp, col_not_diffExp = col_not_diffExp)
-    
-    n_diffExp = n_diffExp_df(df_volcano_format, col_diffExp)
-    return n_diffExp
-
 sample1 = hs_t["S02"]
 sample2 = hs_t["S06"]
-
-n = 100 #each p takes ~3s and q takes ~17s
-fdrs = np.linspace(0,0.2, n+1)  
-delta = fdrs[1]-fdrs[0]
-fdrs = np.append(fdrs, np.linspace(0.2 + delta, 1, int(n/10 + 1)))
-
-diffExp_array = np.array([])
-count = 0
-for fdr in fdrs:
-    print(str(count) + " of " + str(len(fdrs)) + " bins.")
-    fdr_treshold = fdr
-    n_diffExp = compute_nDiff_exp(sample1, sample2, fc_treshold = fc_treshold, fdr_treshold = fdr_treshold, compute_FDR = compute_FDR, col_diffExp = col_diffExp, col_not_diffExp = col_not_diffExp )
-    diffExp_array = np.append(diffExp_array, n_diffExp)
-    count += 1
-
-
- n_diffExp = compute_nDiff_exp(sample1, sample2, fc_treshold = fc_treshold, fdr_treshold = fdr_treshold, compute_FDR = compute_FDR, col_diffExp = col_diffExp, col_not_diffExp = col_not_diffExp )
-
-
-# ACTUALLY ONLY NEED df_volcano_format to compute, dont need to do all the time consuming stuff....
  
+log2fc_vals = get_point_estimate_log2fc(sample1, sample2)
+logFDR = compute_FDR(sample1, sample2, logFunc)
+logFDR = logFDR.squeeze()
+log2fc_vals = log2fc_vals.reindex(index = logFDR.index)
 
+n = 10000 #each p takes ~3s and q takes ~17s
+fdrs = np.linspace(0,1, n+1)
+count = 0
+for fdr in fdrs:  
+    print(str(count) + " of " + str(len(fdrs)) + " bins.")
+    df_volcano_format = volcano_df_format(log2fc_vals, logFDR, logFunc = logFunc, side = side, fc_treshold = fc_treshold, p_treshold =  fdr, col_diffExp = col_diffExp, col_not_diffExp = col_not_diffExp)
+    n_diffExp = n_diffExp_df(df_volcano_format, col_diffExp)
+    count += 1
 
