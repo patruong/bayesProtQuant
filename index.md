@@ -21,6 +21,28 @@ Also here is a link to a page [page2](page2)
 ## Project Log
 ### 2020-06-30 Comparison plot for adjusted intensity and parallell plot for non-adjusted intensity.
 
+#### full set
+![](plots/2019-06-30_compPlot/full/A thaliana_plot.png)
+![](plots/2019-06-30_compPlot/full/C elegans_plot.png)
+![](plots/2019-06-30_compPlot/full/H sapiens_plot.png)
+
+#### S02-S08
+![](plots/2019-06-30_compPlot/S02-S08/A thaliana_plot.png)
+![](plots/2019-06-30_compPlot/S02-S08/C elegans_plot.png)
+![](plots/2019-06-30_compPlot/S02-S08/H sapiens_plot.png)
+
+#### S03-S08
+![](plots/2019-06-30_compPlot/S03-S08/A thaliana_plot.png)
+![](plots/2019-06-30_compPlot/S03-S08/C elegans_plot.png)
+![](plots/2019-06-30_compPlot/S03-S08/H sapiens_plot.png)
+
+#### Parallell coordinates of non-adjusted intensity
+Will do this on adjusted data set later...
+
+[A. Thaliana parallell coordinates](pages/at_t.html)
+[C. Elegans parallell coordinates](pages/ce.html)
+[H. Sapiens parallell coordinates](pages/hs.html)
+
 
 ### 2020-06-27 fixing the 1.0 intensity error in PSSS3 data set for triqler.
 
