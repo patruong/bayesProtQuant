@@ -21,6 +21,9 @@ Also here is a link to a page [page2](page2)
 ## Project Log
 ### 2020-06-30 Comparison plot for adjusted intensity and parallell plot for non-adjusted intensity.
 
+plots/2019-06-30_compPlot/full/A thaliana_plot.png
+![](results/2019-06-26_loglogpq/pi0_est_hs_t_s02_s06.png)
+
 #### full set
 ![](plots/2019-06-30_compPlot/full/A thaliana_plot.png)
 ![](plots/2019-06-30_compPlot/full/C elegans_plot.png)
