@@ -19,6 +19,9 @@ Also here is a link to a page [page2](page2)
 ## Tools
 
 ## Project Log
+### 2020-06-30 Comparison plot for adjusted intensity and parallell plot for non-adjusted intensity.
+
+
 ### 2020-06-27 fixing the 1.0 intensity error in PSSS3 data set for triqler.
 
 [Here is a link to a short analysis of the 1.0 intensities](pages/check_1_intensity.md)
