@@ -354,7 +354,7 @@ def renameTriqler2Vital(df, keepRuns = False):
         #   'protein_id_posterior_error_prob', 'log2_fold_change',
         #   'diff_exp_prob_'+str(diff_exp), 'peptides', 'decoy'], axis = 1).set_index(["protein"]).rename(columns = renameColsMap)
     else:
-        df = df[old_cols].set_index(["protein"]) 
+        df = df[old_cols_prot].set_index(["protein"]) 
     df = df.convert_objects(convert_numeric=True)
     return df
 

@@ -49,7 +49,7 @@ def processTriqler(triqlerFile = "proteins.1vs2.tsv", FDR_treshold = 0.01):
     
     return triqler
 
-def splitTriqlerBySpecies(triqler, exponential = 2, truncated = False): #transform = np.exp2):
+def splitTriqlerBySpecies(triqler, exponential = 2, truncated = False, keepRuns = False): #transform = np.exp2):
     """
     Split triqler into species dataframes.
     
@@ -62,9 +62,9 @@ def splitTriqlerBySpecies(triqler, exponential = 2, truncated = False): #transfo
     hs_t = triqler[triqler["specie"] == "HUMAN"]
         
     # DROP species and drop peptides <------------------------
-    at_t = renameTriqler2Vital(at_t)
-    ce_t = renameTriqler2Vital(ce_t)
-    hs_t = renameTriqler2Vital(hs_t)
+    at_t = renameTriqler2Vital(at_t, keepRuns = keepRuns)
+    ce_t = renameTriqler2Vital(ce_t, keepRuns = keepRuns)
+    hs_t = renameTriqler2Vital(hs_t, keepRuns = keepRuns)
     
     # transform 
     #if transform != False:
@@ -152,7 +152,7 @@ def processSpectronaut(spectronautFile = "500-PSSS3-raw-reformatted_dropna_dropd
     return psss3
 
 
-def splitSpectronautBySpecies(psss3, truncated = False):
+def splitSpectronautBySpecies(psss3, truncated = False, keepRuns = False):
     """
     Split Spectronaut into species dataframes.
     """     
@@ -160,9 +160,9 @@ def splitSpectronautBySpecies(psss3, truncated = False):
     ce_s = psss3[psss3["specie"] == "CAEEL"]
     hs_s = psss3[psss3["specie"] == "HUMAN"]
     
-    at_s = renameTriqler2Vital_nonDetailed(at_s)
-    ce_s = renameTriqler2Vital_nonDetailed(ce_s)
-    hs_s = renameTriqler2Vital_nonDetailed(hs_s)
+    at_s = renameTriqler2Vital_nonDetailed(at_s, keepRuns = keepRuns)
+    ce_s = renameTriqler2Vital_nonDetailed(ce_s, keepRuns = keepRuns)
+    hs_s = renameTriqler2Vital_nonDetailed(hs_s, keepRuns = keepRuns)
     
     if truncated != False:
         if truncated == True:
