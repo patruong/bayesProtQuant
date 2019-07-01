@@ -19,6 +19,67 @@ Also here is a link to a page [page2](page2)
 ## Tools
 
 ## Project Log
+### 2020-07-01 Volcano Plot S02 vs S06 and true FC.
+The true log2FC S02 vs S06
+
+| ARATH | CAEEL | HUMAN |
+|----------------------|------------------|--------------------------| 
+| 0.0                 | -4.011587974275212             | 0.9545685707529938                     |  
+
+#### p-value volcano FC = 0.8
+[p-value Overlay ARATH FC = 0.8 ](pages/2019-06-30_volcanoPlot/p/volcano_overlay_ARATH_S02_S06.html)
+[p-value Overlay CAEEL FC = 0.8](pages/2019-06-30_volcanoPlot/p/volcano_overlay_CAEEL_S02_S06.html)
+[p-value Overlay HUMAN FC = 0.8](pages/2019-06-30_volcanoPlot/p/volcano_overlay_HUMAN_S02_S06.html)
+
+[p-value Spectronaut ARATH FC = 0.8](pages/2019-06-30_volcanoPlot/p/volcano_spectronaut_ARATH_S02_S06.html)
+[p-value Spectronaut CAEEL FC = 0.8](pages/2019-06-30_volcanoPlot/p/volcano_spectronaut_CAEEL_S02_S06.html)
+[p-value Spectronaut HUMAN FC = 0.8](pages/2019-06-30_volcanoPlot/p/volcano_spectronaut_HUMAN_S02_S06.html)
+
+[p-value Triqler ARATH FC = 0.8](pages/2019-06-30_volcanoPlot/p/volcano_triqler_ARATH_S02_S06.html)
+[p-value Triqler CAEEL FC = 0.8](pages/2019-06-30_volcanoPlot/p/volcano_triqler_CAEEL_S02_S06.html)
+[p-value Triqler HUMAN FC = 0.8](pages/2019-06-30_volcanoPlot/p/volcano_triqler_HUMAN_S02_S06.html)
+
+#### p-value volcano FC = True FC 
+[p-value Overlay ARATH FC = True FC](pages/2019-06-30_volcanoPlot/pTrue/volcano_overlay_ARATH_S02_S06.html)
+[p-value Overlay CAEEL FC = True FC](pages/2019-06-30_volcanoPlot/pTrue/volcano_overlay_CAEEL_S02_S06.html)
+[p-value Overlay HUMAN FC = True FC](pages/2019-06-30_volcanoPlot/pTrue/volcano_overlay_HUMAN_S02_S06.html)
+
+[p-value Spectronaut ARATH FC = True FC](pages/2019-06-30_volcanoPlot/pTrue/volcano_spectronaut_ARATH_S02_S06.html)
+[p-value Spectronaut CAEEL FC = True FC](pages/2019-06-30_volcanoPlot/pTrue/volcano_spectronaut_CAEEL_S02_S06.html)
+[p-value Spectronaut HUMAN FC = True FC](pages/2019-06-30_volcanoPlot/pTrue/volcano_spectronaut_HUMAN_S02_S06.html)
+
+[p-value Triqler ARATH FC = True FC](pages/2019-06-30_volcanoPlot/pTrue/volcano_triqler_ARATH_S02_S06.html)
+[p-value Triqler CAEEL FC = True FC](pages/2019-06-30_volcanoPlot/pTrue/volcano_triqler_CAEEL_S02_S06.html)
+[p-value Triqler HUMAN FC = True FC](pages/2019-06-30_volcanoPlot/pTrue/volcano_triqler_HUMAN_S02_S06.html)
+#### q-value volcano FC = 0.8
+[q-value Overlay ARATH FC = 0.8](pages/2019-06-30_volcanoPlot/q/volcano_overlay_ARATH_S02_S06.html)
+[q-value Overlay CAEEL FC = 0.8](pages/2019-06-30_volcanoPlot/q/volcano_overlay_CAEEL_S02_S06.html)
+[q-value Overlay HUMAN FC = 0.8](pages/2019-06-30_volcanoPlot/q/volcano_overlay_HUMAN_S02_S06.html)
+
+[q-value Spectronaut ARATH FC = 0.8](pages/2019-06-30_volcanoPlot/q/volcano_spectronaut_ARATH_S02_S06.html)
+[q-value Spectronaut CAEEL FC = 0.8](pages/2019-06-30_volcanoPlot/q/volcano_spectronaut_CAEEL_S02_S06.html)
+[q-value Spectronaut HUMAN FC = 0.8](pages/2019-06-30_volcanoPlot/q/volcano_spectronaut_HUMAN_S02_S06.html)
+
+[q-value Triqler ARATH FC = 0.8](pages/2019-06-30_volcanoPlot/q/volcano_triqler_ARATH_S02_S06.html)
+[q-value Triqler CAEEL FC = 0.8](pages/2019-06-30_volcanoPlot/q/volcano_triqler_CAEEL_S02_S06.html)
+[q-value Triqler HUMAN FC = 0.8](pages/2019-06-30_volcanoPlot/q/volcano_triqler_HUMAN_S02_S06.html)
+#### q-value volcano FC = True FC
+[q-value Overlay ARATH FC = True FC](pages/2019-06-30_volcanoPlot/qTrue/volcano_overlay_ARATH_S02_S06.html)
+[q-value Overlay CAEEL FC = True FC](pages/2019-06-30_volcanoPlot/qTrue/volcano_overlay_CAEEL_S02_S06.html)
+[q-value Overlay HUMAN FC = True FC](pages/2019-06-30_volcanoPlot/qTrue/volcano_overlay_HUMAN_S02_S06.html)
+
+[q-value Spectronaut ARATH FC = True FC](pages/2019-06-30_volcanoPlot/qTrue/volcano_spectronaut_ARATH_S02_S06.html)
+[q-value Spectronaut CAEEL FC = True FC](pages/2019-06-30_volcanoPlot/qTrue/volcano_spectronaut_CAEEL_S02_S06.html)
+[q-value Spectronaut HUMAN FC = True FC](pages/2019-06-30_volcanoPlot/qTrue/volcano_spectronaut_HUMAN_S02_S06.html)
+
+[q-value Triqler ARATH FC = True FC](pages/2019-06-30_volcanoPlot/qTrue/volcano_triqler_ARATH_S02_S06.html)
+[q-value Triqler CAEEL FC = True FC](pages/2019-06-30_volcanoPlot/qTrue/volcano_triqler_CAEEL_S02_S06.html)
+[q-value Triqler HUMAN FC = True FC](pages/2019-06-30_volcanoPlot/qTrue/volcano_triqler_HUMAN_S02_S06.html)
+
+Note the issue with pi0 = estimated or 1...
+
+
+
 ### 2020-06-30 Comparison plot for adjusted intensity and parallell plot for non-adjusted intensity.
 
 #### full set
@@ -43,6 +104,7 @@ Will do this on adjusted data set later...
 [C. Elegans parallell coordinates](pages/ce.html)
 [H. Sapiens parallell coordinates](pages/hs.html)
 
+NOTE TO SELF: still need to fix label issue for parallell coordinates.
 
 ### 2020-06-27 fixing the 1.0 intensity error in PSSS3 data set for triqler.
 
