@@ -19,7 +19,23 @@ Also here is a link to a page [page2](page2)
 ## Tools
 
 ## Project Log
-### 2020-07-01 Volcano Plot S02 vs S06 and true FC.
+### 2020-07-01 Thoughts on volcano plots, parallell coordinates and data processeing.
+
+#### Notes on data processing for volcano plot and parallell coordinates on previous posts...
+The FDR used was on protein identification FDR. For spectronaut PG.Qvalue < 0.01 was used and for triqler protein_id_posterior_error_prob < 0.01 was used. 
+
+protein_id_posterior_error_prob is calculated from "searchScore" in triqler input (which is the PG.Cscore). The PG.Cscore are converted to PEP-values and these PEP-values are then logarthimed and summed for target and decoy proteins. 
+
+#### Parallell coordinates notes...
+The data is normalized protein-wise (row-wise). High spectronaut values (>0.8) are caused by normalization where one value is much bigger than the others or when there are lots of NaNs in the protein-row. Triqler has no NaNs and the plot therefore becomes a lot more "well-behaved". 
+
+This could possibly be fixed by assuming proteins with a lot of NaNs are not clearly identified and should thus be omitted, and in the case of very large outlying proteins, either omit the protein or omit the outlier values. 
+
+#### volcano plot...
+The triqler points are computed by t-testing the means from the posterior distributions for each protein. This does not fully utilize triqlers FC q-value computation abilities. 
+
+On the side note, these means from the posterior distributions seems to consistently perform in a more correct manner than spectronaut results. They are more centered around correct FC and have a better TP/(TP+FN) ratio.
+
 
 ### 2020-07-01 Volcano Plot S02 vs S06 and true FC.
 The true log2FC S02 vs S06
