@@ -1,0 +1,4 @@
+S02:S06
+ARATH, side:two, FC:0, t_diff:3, s_diff:37
+HUMAN, side:fc, FC:0.95;0.95/2, t_diff:5128, s_diff:3785
+CAEEL, side:fc, FC:-4.0;4/2, t_diff:615, s_diff:162
