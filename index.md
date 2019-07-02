@@ -26,9 +26,17 @@ PG.Qvalue < 0.01
 Q-value based on protein_id_posterior_error_prob expanding mean < 0.01
 Samples are averaged to concatenate runs.
 Normalization on proteins (row-wise) resulting in fractions. 
+Orange line - Spectronaut.
+Blue line - triqler.
+red line - true fractions.
 
+CAEEL.
 ![](plots/2019-07-02_parCoord/caeel_parCoord.png)
+
+HUMAN - triqler on top.
 ![](plots/2019-07-02_parCoord/human_parCoord.png)
+
+HUMAN - spectronaut on top.
 ![](plots/2019-07-02_parCoord/human_parCoord2.png)
 
 
