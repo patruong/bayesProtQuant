@@ -36,7 +36,8 @@ def qvalues(pvalues):
     m = float(len(pvalues.transpose().values[0].tolist()))
     assert(m>0)
     pvalues = pvalues.sort_values(by = pcolname)
-    pi0 = estimatePi0(pvalues.transpose().values[0].tolist())
+    #pi0 = estimatePi0(pvalues.transpose().values[0].tolist())
+    pi0 = 1
     num_p, p_sum = 0, 0.0
 
     qs = pd.DataFrame(columns = [ 'q' ])
