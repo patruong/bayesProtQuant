@@ -19,10 +19,33 @@ Also here is a link to a page [page2](page2)
 ## Tools
 
 ## Project Log
+### 2020-07-02 Parallell coordinates, highlights.
+Parameters
+Treshold
+PG.Qvalue < 0.01
+Q-value based on protein_id_posterior_error_prob expanding mean < 0.01
+Samples are averaged to concatenate runs.
+Normalization on proteins (row-wise) resulting in fractions. 
+
+![](plots/2019-07-02_parCoord/caeel_parCoord.png)
+![](plots/2019-07-02_parCoord/human_parCoord.png)
+![](plots/2019-07-02_parCoord/human_parCoord2.png)
+
+
+
 ### 2020-07-01 Thoughts on volcano plots, parallell coordinates and data processeing.
 
 #### Notes on data processing for volcano plot and parallell coordinates on previous posts...
-The FDR used was on protein identification FDR. For spectronaut PG.Qvalue < 0.01 was used and for triqler protein_id_posterior_error_prob < 0.01 was used. 
+The FDR used was on protein identification FDR. For spectronaut PG.Qvalue < 0.01 was used and for triqler protein_id_posterior_error_prob converted to q-value < 0.01 was used. 
+
+```python
+...
+triqler.sort_values(by = "protein_id_posterior_error_prob", inplace = True)
+triqler["FDR"] = triqler["protein_id_posterior_error_prob"].expanding().mean()
+triqler = triqler[triqler["FDR"] < 0.01]
+...
+```
+
 
 protein_id_posterior_error_prob is calculated from "searchScore" in triqler input (which is the PG.Cscore). The PG.Cscore are converted to PEP-values and these PEP-values are then logarthimed and summed for target and decoy proteins. 
 
