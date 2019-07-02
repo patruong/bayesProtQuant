@@ -29,11 +29,10 @@ We investigate amount of differential expression in the vicinity of true FC. The
 
 Differentially expressed proteins
 
-|METHOD | ARATH | CAEEL | HUMAN |
-|----------------------|------------------|--------------------------| 
-| Triqler       |     3     | 615             | 5128                     |  
-| Spectronaut       |    37      | 162             | 3785                     |  
-
+| Method      | ARATH | CAEEL | HUMAN |
+|-------------|-------|-------|-------|
+| Triqler     | 3     | 615   | 5128  |
+| Spectronaut | 37    | 162   | 3785  |
 
 
 [q-value Overlay ARATH FC = 0.0 ](pages/2019-07-02_volcanoFC/volcano_overlay_ARATH_S02_S06.html)
