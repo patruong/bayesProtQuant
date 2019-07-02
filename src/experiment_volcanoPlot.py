@@ -15,7 +15,7 @@ from func import *
 # Triqler  ##
 #############
 
-def get_triqler_volcano_df_pVals(triqlerFile, protein_id_fdr_treshold, specie, s1, s2, logFunc = np.log2, side = "two", fc_treshold = 1.0, p_treshold = 0.05, col_diffExp = "red", col_not_diffExp = "blue", pickle_path = "../data/pickled/"):
+def get_triqler_volcano_df_pVals(triqlerFile, protein_id_fdr_treshold, specie, s1, s2, logFunc = np.log2, side = "two", fc_treshold = 1.0, fc_dev = 0.2, p_treshold = 0.05, col_diffExp = "red", col_not_diffExp = "blue", pickle_path = "../data/pickled/"):
     """
     s1,s2 = S01...S10
     """
@@ -37,10 +37,10 @@ def get_triqler_volcano_df_pVals(triqlerFile, protein_id_fdr_treshold, specie, s
     #log10P = compute_log10P(sample1, sample2)
     logP = compute_logP(sample1, sample2, logFunc)
     #df_volcano_format = volcano_df_format(log2fc_vals, log2P[0], side = side, fc_treshold = fc_treshold, p_treshold = p_treshold, col_diffExp = col_diffExp, col_not_diffExp = col_not_diffExp)
-    df_volcano_format = volcano_df_format(log2fc_vals, logP[0], logFunc = logFunc, side = side, fc_treshold = fc_treshold, p_treshold = p_treshold, col_diffExp = col_diffExp, col_not_diffExp = col_not_diffExp)
+    df_volcano_format = volcano_df_format(log2fc_vals, logP[0], logFunc = logFunc, side = side, fc_treshold = fc_treshold, fc_dev = fc_dev, p_treshold = p_treshold, col_diffExp = col_diffExp, col_not_diffExp = col_not_diffExp)
     return df_volcano_format
 
-def get_triqler_volcano_df_qVals(triqlerFile, protein_id_fdr_treshold, specie, s1, s2, logFunc = np.log2, side = "two", fc_treshold = 1.0, p_treshold = 0.05, col_diffExp = "red", col_not_diffExp = "blue", pickle_path = "../data/pickled/"):
+def get_triqler_volcano_df_qVals(triqlerFile, protein_id_fdr_treshold, specie, s1, s2, logFunc = np.log2, side = "two", fc_treshold = 1.0, fc_dev = 0.2, p_treshold = 0.05, col_diffExp = "red", col_not_diffExp = "blue", pickle_path = "../data/pickled/"):
     """
     s1,s2 = S01...S10
     """
@@ -60,15 +60,15 @@ def get_triqler_volcano_df_qVals(triqlerFile, protein_id_fdr_treshold, specie, s
     log2fc_vals = get_point_estimate_log2fc(sample1, sample2)
     logQ = compute_logQ(sample1, sample2, logFunc)
     log2fc_vals = log2fc_vals.reindex(index = logQ.index)
-    df_volcano_format = volcano_df_format(log2fc_vals, logQ, logFunc = logFunc, side = side, fc_treshold = fc_treshold, p_treshold = p_treshold, col_diffExp = col_diffExp, col_not_diffExp = col_not_diffExp)
+    df_volcano_format = volcano_df_format(log2fc_vals, logQ, logFunc = logFunc, side = side, fc_treshold = fc_treshold, fc_dev = fc_dev, p_treshold = p_treshold, col_diffExp = col_diffExp, col_not_diffExp = col_not_diffExp)
     return df_volcano_format
 
 
 ###############
 # Spectronaut #
 ###############
-
-def get_spectronaut_volcano_df_pVals(spectronautFile, protein_id_fdr_treshold, specie, s1, s2, logFunc = np.log2, side = "two", fc_treshold = 1.0, p_treshold = 0.05, col_diffExp = "red", col_not_diffExp = "blue", pickle_path = "../data/pickled/"):
+    
+def get_spectronaut_volcano_df_pVals(spectronautFile, protein_id_fdr_treshold, specie, s1, s2, logFunc = np.log2, side = "two", fc_treshold = 1.0, fc_dev = 0.2, p_treshold = 0.05, col_diffExp = "red", col_not_diffExp = "blue", pickle_path = "../data/pickled/"):
     """
     s1,s2 = S01...S10
     """
@@ -89,10 +89,10 @@ def get_spectronaut_volcano_df_pVals(spectronautFile, protein_id_fdr_treshold, s
     #log10P = compute_log10P(sample1, sample2)
     logP = compute_logP(sample1, sample2, logFunc)    
     #df_volcano_format = volcano_df_format(log2fc_vals, log2P[0], side = side, fc_treshold = fc_treshold, p_treshold = p_treshold, col_diffExp = col_diffExp, col_not_diffExp = col_not_diffExp)
-    df_volcano_format = volcano_df_format(log2fc_vals, logP[0], logFunc = logFunc, side = side, fc_treshold = fc_treshold, p_treshold = p_treshold, col_diffExp = col_diffExp, col_not_diffExp = col_not_diffExp)
+    df_volcano_format = volcano_df_format(log2fc_vals, logP[0], logFunc = logFunc, side = side, fc_treshold = fc_treshold, fc_dev = fc_dev, p_treshold = p_treshold, col_diffExp = col_diffExp, col_not_diffExp = col_not_diffExp)
     return df_volcano_format
 
-def get_spectronaut_volcano_df_qVals(spectronautFile, protein_id_fdr_treshold, specie, s1, s2, logFunc = np.log2, side = "two", fc_treshold = 1.0, p_treshold = 0.05, col_diffExp = "red", col_not_diffExp = "blue", pickle_path = "../data/pickled/"):
+def get_spectronaut_volcano_df_qVals(spectronautFile, protein_id_fdr_treshold, specie, s1, s2, logFunc = np.log2, side = "two", fc_treshold = 1.0, fc_dev = 0.2, p_treshold = 0.05, col_diffExp = "red", col_not_diffExp = "blue", pickle_path = "../data/pickled/"):
     """
     s1,s2 = S01...S10
     """
@@ -111,7 +111,7 @@ def get_spectronaut_volcano_df_qVals(spectronautFile, protein_id_fdr_treshold, s
     log2fc_vals = get_point_estimate_log2fc(sample1, sample2)
     logQ = compute_logQ(sample1, sample2, logFunc)
     log2fc_vals = log2fc_vals.reindex(index = logQ.index)
-    df_volcano_format = volcano_df_format(log2fc_vals, logQ, logFunc = logFunc, side = side, fc_treshold = fc_treshold, p_treshold = p_treshold, col_diffExp = col_diffExp, col_not_diffExp = col_not_diffExp)
+    df_volcano_format = volcano_df_format(log2fc_vals, logQ, logFunc = logFunc, side = side, fc_treshold = fc_treshold, fc_dev = fc_dev, p_treshold = p_treshold, col_diffExp = col_diffExp, col_not_diffExp = col_not_diffExp)
     return df_volcano_format
 
 
@@ -127,9 +127,10 @@ if __name__ == "__main__":
     triqlerFile = "tmp"
     spectronautFile = "tmp"
     protein_id_fdr_treshold = 0.01
-    fc_treshold = 0.8
+    fc_treshold = 0.95
+    fc_dev = fc_treshold/2
     p_treshold = 0.05
-    side = "two"
+    side = "fc"
     specie = "HUMAN"
     s1 = "S02"
     s2 = "S06"
@@ -137,10 +138,14 @@ if __name__ == "__main__":
     logP_treshold = -logFunc(p_treshold)
 
     triqler_diffExp_col = "firebrick"
-    triqler_not_diffExp_col = "gold"
-
+    triqler_not_diffExp_col = "gold" 
     spectronaut_diffExp_col = "green"
     spectronaut_not_diffExp_col = "steelblue"
+#    
+#    triqler_diffExp_col = "steelblue"
+#    triqler_not_diffExp_col = "steelblue" 
+#    spectronaut_diffExp_col = "green"
+#    spectronaut_not_diffExp_col = "green"
     
     title_triqler = "Triqler| " + "proteid_id_fdr: " + str(protein_id_fdr_treshold) + "| fc_treshold: " + str(fc_treshold) + "| p_treshold " + str(p_treshold) + "| specie: " + specie + " " + s1 + ":" + s2
     title_spec = "Spectronaut| " + "proteid_id_fdr: " + str(protein_id_fdr_treshold) + "| fc_treshold: " + str(fc_treshold) + "| p_treshold " + str(p_treshold) + "| specie: " + specie + " " + s1 + ":" + s2
@@ -153,11 +158,11 @@ if __name__ == "__main__":
 
     
     df_triqler = get_triqler_volcano_df_pVals(triqlerFile, protein_id_fdr_treshold, specie, s1, s2, 
-                                              logFunc = logFunc, side = side, fc_treshold = fc_treshold,
+                                              logFunc = logFunc, side = side, fc_treshold = fc_treshold, fc_dev = fc_dev,
                                               p_treshold = p_treshold, col_diffExp = triqler_diffExp_col,
                                               col_not_diffExp = triqler_not_diffExp_col)
 #    df_triqler = get_triqler_volcano_df_qVals(triqlerFile, protein_id_fdr_treshold, specie, s1, s2, 
-#                                              logFunc = logFunc, side = side, fc_treshold = fc_treshold,
+#                                              logFunc = logFunc, side = side, fc_treshold = fc_treshold, fc_dev = fc_dev,
 #                                              p_treshold = p_treshold, col_diffExp = triqler_diffExp_col,
 #                                              col_not_diffExp = triqler_not_diffExp_col)
    
@@ -170,11 +175,11 @@ if __name__ == "__main__":
 
     
     df_spec = get_spectronaut_volcano_df_pVals(spectronautFile, protein_id_fdr_treshold, specie, s1, s2,
-                                               logFunc = logFunc, side = side, fc_treshold = fc_treshold,
+                                               logFunc = logFunc, side = side, fc_treshold = fc_treshold, fc_dev = fc_dev,
                                                p_treshold = p_treshold, col_diffExp = spectronaut_diffExp_col,
                                                col_not_diffExp = spectronaut_not_diffExp_col)
 #    df_spec = get_spectronaut_volcano_df_qVals(spectronautFile, protein_id_fdr_treshold, specie, s1, s2,
-#                                               logFunc = logFunc, side = side, fc_treshold = fc_treshold,
+#                                               logFunc = logFunc, side = side, fc_treshold = fc_treshold, fc_dev = fc_dev
 #                                               p_treshold = p_treshold, col_diffExp = spectronaut_diffExp_col,
 #                                               col_not_diffExp = spectronaut_not_diffExp_col)
 #    

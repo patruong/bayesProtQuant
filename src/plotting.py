@@ -169,10 +169,11 @@ def nanAdjustCol(df, booleandf):
     booleandf = nandf*booleandf
     return booleandf
 
-def volcano_df_format(log2fc, log2P, logFunc = np.log2, side = "two", fc_treshold = 1.0, p_treshold = 0.05, col_diffExp = "red", col_not_diffExp = "blue"):
+def volcano_df_format(log2fc, log2P, logFunc = np.log2, side = "two", fc_treshold = 1.0, fc_dev = 0.2, p_treshold = 0.05, col_diffExp = "red", col_not_diffExp = "blue"):
     """
     log2fc - as pandas series with protein names indices.
     log2P - as pandas series with protein names indices.
+    fc_dev - if side = "fc", how wide should the interval around the fc be.
     """
     # params
 
@@ -211,8 +212,13 @@ def volcano_df_format(log2fc, log2P, logFunc = np.log2, side = "two", fc_treshol
         booleandf = pd.DataFrame(np.array([booleandf_right, booleandf_left]).T, columns = ["right", "left"])
         booleandf = booleandf.any(axis = 1)
         booleandf = nanAdjustCol(df, booleandf)
+    elif ((side == "fc")):
+        print("Interval around FC")
+        booleandf = ((df["log2fc"] > fc_treshold - np.abs(fc_dev)) & (df["logFDR"] > logP_treshold) & (df["log2fc"] < fc_treshold + np.abs(fc_dev)))
+        booleandf = nanAdjustCol(df, booleandf) 
     booleanDictionary = {1: col_diffExp, 0: col_not_diffExp}
     df["color"] = booleandf.map(booleanDictionary)
+    df["diffExp"] = booleandf.map({1: True, 0: False}) 
     return df
 
 
@@ -255,7 +261,7 @@ def volcanoPlot(df, vertical_line_r = None, vertical_line_l = None, horizontal_l
     bpl.show(p)
 
 
-def volcanoPlot_spectronaut_triqler(df1, df2, vertical_line_r = None, vertical_line_l = None, horizontal_line = None, plot_width = 1000, plot_height = 1000, title = "plot", x_label = "xlabel", y_label = "ylabel", outputFile = None):
+def volcanoPlot_spectronaut_triqler(df_spec, df_triq, vertical_line_r = None, vertical_line_l = None, horizontal_line = None, plot_width = 1000, plot_height = 1000, title = "plot", x_label = "xlabel", y_label = "ylabel", outputFile = None):
     plot_width = plot_width
     plot_height = plot_height
     title = title
@@ -278,7 +284,7 @@ def volcanoPlot_spectronaut_triqler(df1, df2, vertical_line_r = None, vertical_l
         hline = bmo.Span(location=horizontal_line, dimension='width', line_color='red', line_dash = "dashed", line_width=1, line_alpha = 0.8)
         p.renderers.extend([hline])
     
-    for data, name in zip([df1, df2], ["Triqler", "Spectronaut"]):
+    for data, name in zip([df_spec, df_triq], ["Spectronaut", "Triqler"]):
         df = pd.DataFrame(data)
         
         source = bpl.ColumnDataSource.from_df(df)

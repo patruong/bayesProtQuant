@@ -15,6 +15,7 @@ from triqlerProcessor import *
 from utils import * 
 from parseReformattedPSSS3equDecoy import * # Needs to tidy and place functions in right place!
 from proc import *
+from plotting import * 
 #from corrPlot import * #correlation plotting
 
 import os
