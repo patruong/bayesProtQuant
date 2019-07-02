@@ -19,8 +19,22 @@ Also here is a link to a page [page2](page2)
 ## Tools
 
 ## Project Log
-### 2020-07-02 Parallell coordinates, highlights.
+### 2020-07-02 Volcano plot S02 vs S06 with correct FC range.
 Parameters
+Treshold on protein id.
+PG.Qvalue < 0.01
+Q-value based on protein_id_posterior_error_prob expanding mean < 0.01
+
+We investigate amount of differential expression in the vicinity of true FC. The interval range was based on trueFC/2 for CAEEL and HUMAN. For ARATH no FC interval was used, since all registered diffExp are false.
+
+[q-value Overlay ARATH FC = 0.0 ](pages/2019-07-02_volcanoFC/volcano_overlay_ARATH_S02_S06.html)
+
+[q-value Overlay CAEEL FC = -6 < FC < -2 ](pages/2019-07-02_volcanoFC/volcano_overlay_CAEEL_S02_S06.html)
+
+[q-value Overlay HUMAN FC = 0.475 < FC < 1.425](pages/2019-07-02_volcanoFC/volcano_overlay_HUMAN_S02_S06.html)
+
+### 2020-07-02 Parallell coordinates, highlights.
+Parameters:
 Treshold
 PG.Qvalue < 0.01
 Q-value based on protein_id_posterior_error_prob expanding mean < 0.01
