@@ -258,7 +258,8 @@ def volcanoPlot(df, vertical_line_r = None, vertical_line_l = None, horizontal_l
         'logFDR', source=source, color='color')
     if outputFile != None:
         bpl.output_file(outputFile)
-    bpl.show(p)
+    #bpl.show(p)
+    bpl.save(p)
 
 
 def volcanoPlot_spectronaut_triqler(df_spec, df_triq, vertical_line_r = None, vertical_line_l = None, horizontal_line = None, plot_width = 1000, plot_height = 1000, title = "plot", x_label = "xlabel", y_label = "ylabel", outputFile = None):
@@ -295,4 +296,5 @@ def volcanoPlot_spectronaut_triqler(df_spec, df_triq, vertical_line_r = None, ve
     p.legend.click_policy="mute"
     if outputFile != None:  
         bpl.output_file(outputFile)    
-    bpl.show(p)
+    #bpl.show(p)
+    bpl.save(p)

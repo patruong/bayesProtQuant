@@ -347,7 +347,9 @@ def getMixtures(truncated = False):
     a_mix = np.array([0.5] * 10)
     a_mix[0] += 0.0001
     c_mix = np.array([0.5, 0.25, 0.125, 0.0625, 0.031, 0.0155, 0.008, 0.004, 0.002, 0.0])
+    c_mix[-1] = np.nextafter(0,1)
     h_mix = np.array([0.0, 0.25, 0.375, 0.4375, 0.469, 0.4845, 0.492, 0.496, 0.498, 0.5])
+    h_mix[0] = np.nextafter(0,1)
     if truncated != False:
         if truncated == True:
             print("Getting mixtures for [S02 S03 S04 S05 S06 S07 S08 S09]")
@@ -372,7 +374,9 @@ def getMixtures(truncated = False):
         print("Getting mixtures for [S01 S02 S03 S04 S05 S06 S07 S08 S09 S10]")
         a_mix = a_mix/a_mix.sum()
         c_mix = c_mix/c_mix.sum()
+        c_mix[-1] = np.nextafter(0,1)
         h_mix = h_mix/h_mix.sum()
+        h_mix[0] = np.nextafter(0,1)
         mix = {'A thaliana':a_mix, 'C elegans': c_mix, 'H sapiens': h_mix}
     
     return a_mix, c_mix, h_mix, mix

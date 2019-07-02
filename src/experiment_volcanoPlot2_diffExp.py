@@ -125,8 +125,13 @@ def n_diffExp(df):
     n = len(df[df.diffExp == True])
     return n
 
-
-
+def diffExpRatio(df):
+    """
+    get the ratio of differential expression.
+    """
+    diffExp = n_diffExp(df)
+    ratio = diffExp / len(df)
+    return ratio
 
 if __name__ == "__main__":
     # plot params
@@ -139,13 +144,13 @@ if __name__ == "__main__":
     triqlerFile = "tmp"
     spectronautFile = "tmp"
     protein_id_fdr_treshold = 0.01
-    fc_treshold = -4.00
+    fc_treshold = -9.00
     fc_dev = fc_treshold/2
     p_treshold = 0.05
     side = "fc"
     specie = "CAEEL"
-    s1 = "S02"
-    s2 = "S06"
+    s1 = "S01"
+    s2 = "S10"
     logFunc = np.log10 #Adjust y-label to match this!
     logP_treshold = -logFunc(p_treshold)
     vertical_line_r = fc_treshold + fc_dev
