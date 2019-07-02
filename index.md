@@ -27,6 +27,14 @@ Q-value based on protein_id_posterior_error_prob expanding mean < 0.01
 
 We investigate amount of differential expression in the vicinity of true FC. The interval range was based on trueFC/2 for CAEEL and HUMAN. For ARATH no FC interval was used, since all registered diffExp are false.
 
+Differentially expressed proteins
+|METHOD | ARATH | CAEEL | HUMAN |
+|----------------------|------------------|--------------------------| 
+| Triqler       |     3     | 615             | 5128                     |  
+| Spectronaut       |    37      | 162             | 3785                     |  
+
+
+
 [q-value Overlay ARATH FC = 0.0 ](pages/2019-07-02_volcanoFC/volcano_overlay_ARATH_S02_S06.html)
 
 [q-value Overlay CAEEL FC = -6 < FC < -2 ](pages/2019-07-02_volcanoFC/volcano_overlay_CAEEL_S02_S06.html)
