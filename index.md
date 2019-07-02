@@ -29,7 +29,7 @@ Normalization on proteins (row-wise) resulting in fractions.
 Orange line - Spectronaut.
 Blue line - triqler.
 red line - true fractions.
-
+NOTE: -0.1 values in parallell coordinates are NaN:s converted to -0.1.
 CAEEL.
 ![](plots/2019-07-02_parCoord/caeel_parCoord.png)
 
