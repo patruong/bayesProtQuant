@@ -286,30 +286,30 @@ if __name__ == "__main__":
             diffExp_dict.update({"spectronaut" + "_" + key + "_" + specie : (n_diffExp_proteins_s, diffExp_ratio_s)})
 
             title_triqler = ("Triqler" + 
-                             "| specie: " + specie + " " + s1 + ":" + s2 +
-                             "| proteid_id_fdr: " + str(protein_id_fdr_treshold) + 
-                             "| fc_treshold: " + str(fc_treshold) + 
-                             "| q_treshold: " + str(p_treshold) + 
-                             "| diffExp: " + str(n_diffExp_proteins_t) + 
-                             "| diffExp ratio: " + str(diffExp_ratio_t)
+                             "| " + specie + " " + s1 + ":" + s2 +
+                             "| protein_fdr: " + str(protein_id_fdr_treshold) + 
+                             "| fc: " + str(fc_treshold) + 
+                             "| q_tresh: " + str(p_treshold) + 
+                             "| DE: " + str(n_diffExp_proteins_t) + 
+                             "| DE-ratio: " + str(diffExp_ratio_t)
                              )
             title_spec = ("Spectronaut" +
-                          "| specie: " + specie + " " + s1 + ":" + s2 + 
-                          "| proteid_id_fdr: " + str(protein_id_fdr_treshold) + 
-                          "| fc_treshold: " + str(fc_treshold) + 
-                          "| q_treshold: " + str(p_treshold) + 
-                          "| diffExp: " + str(n_diffExp_proteins_s) + 
-                          "| diffExp ratio: " + str(diffExp_ratio_s)                          
+                          "| " + specie + " " + s1 + ":" + s2 + 
+                          "| protein_fdr: " + str(protein_id_fdr_treshold) + 
+                          "| fc: " + str(fc_treshold) + 
+                          "| q_treshold: " + str(p_treshold) +
+                          "| DE: " + str(n_diffExp_proteins_s) + 
+                          "| DE ratio: " + str(diffExp_ratio_s)                          
                           )
             title_overlay = ("Overlay" +
-                             "| specie: " + specie + " " + s1 + ":" + s2 +
-                             "| proteid_id_fdr: " + str(protein_id_fdr_treshold) + 
-                             "| fc_treshold: " + str(fc_treshold) + 
+                             "| " + specie + " " + s1 + ":" + s2 +
+                             "| protein_fdr: " + str(protein_id_fdr_treshold) + 
+                             "| fc: " + str(fc_treshold) + 
                              "| q_treshold: " + str(p_treshold) +
-                             "| diffExp(triqler): " + str(n_diffExp_proteins_t) + 
-                             "| diffExp ratio(triqler): " + str(diffExp_ratio_t) +
-                             "| diffExp(spectronaut): " + str(n_diffExp_proteins_s) +
-                             "| diffExp ratio(spectronaut): " + str(diffExp_ratio_s)
+                             "| DE(t): " + str(n_diffExp_proteins_t) + 
+                             "| DEr(t): " + str(diffExp_ratio_t) +
+                             "| DE(s): " + str(n_diffExp_proteins_s) +
+                             "| DEr(s): " + str(diffExp_ratio_s)
                              )                
      
             outputFile_triqler = "volcano_triqler_"+specie+"_"+s1+"_"+s2 + ".html"
