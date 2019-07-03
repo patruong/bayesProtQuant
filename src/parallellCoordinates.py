@@ -85,6 +85,7 @@ def concatenatedDF(df_s, df_t, df_true):
 
 df = concatenatedDF(hs_s, hs_t, hs_true)
 df = concatenatedDF(ce_s, ce_t, ce_true)
+df = concatenatedDF(at_s, at_t, ce_true)
 #df = df[df.count(axis=1) > 8]
 df = df.fillna(-0.1)
 # parallell coordinates
@@ -106,7 +107,7 @@ layout = go.Layout(
     paper_bgcolor = '#E5E5E5'
 )
 
-plot(data, filename="hs.html")
+plot(data, filename="at.html")
 
 # Find max
 at_s[at_s.iloc[:,1] == at_s.iloc[:,1].max()]
