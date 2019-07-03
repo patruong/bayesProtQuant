@@ -19,6 +19,53 @@ Also here is a link to a page [page2](page2)
 ## Tools
 
 ## Project Log
+### 2020-07-03 Differential expression.
+Parameters
+Treshold on protein id.
+PG.Qvalue < 0.01
+Q-value based on protein_id_posterior_error_prob expanding mean < 0.01
+-0.1 values on Parallell coordinates are NaN.
+In parallell coordinates orange(Spectronaut), blue(triqler) and red line(true).
+
+Same approach as previous entry was used to on all samples. 
+
+Missing values:
+![](plots/2019-07-03_volcanoAnalysis/missing-Values.png)
+
+ARATH
+![](plots/2019-07-03_volcanoAnalysis/ARATH_diffExp.png)
+![](plots/2019-07-03_volcanoAnalysis/ARATH_volcano_S01_S08.png)
+
+Triqler reports lower DE proteins than spectronaut. 
+
+CAEEL
+![](plots/2019-07-03_volcanoAnalysis/CAEEL_diffExp.png)
+
+Spectronaut seems to have high DE proteins in S01:S02 and S01:S03. The drop-off in DE proteins is due to priors not being trained properly due to missing values. 
+
+![](plots/2019-07-03_volcanoAnalysis/CAEEL_PC_twoGroups.png)
+
+There seems to be two groups of proteins in triqler. The group that is correctly quantified and the group where protein priors are not updated sufficiently, even though S01 does not have many missing values, in this case.  
+
+HUMAN Analysis
+![](plots/2019-07-03_volcanoAnalysis/HUMAN_diffExp.png)
+
+Note that triqler has less DE proteins between S01 and the other samples even though the fold-change between S01 and other samples are largest. The parallell coordinates show us.
+
+![](plots/2019-07-03_volcanoAnalysis/HUMAN_PC_S01_analysis.png)
+
+This shows us that a lot of the proteins have priors that are not correctly updated as S01 as these proteins simply are missing values for spectronaut. I am not sure about the drop of in DE proteins for comparisons between S03-S04:S08-S10. Since, S08-S10 have a increasing relative FC.
+
+Note: that high spectronaut values (>0.8) in parallell coordinates are caused by missing values or outlier values (which are much larger).
+
+parallell coordinates are presented below.
+
+[ARATH](plots/2019-07-03_volcanoAnalysis/at.html)
+
+[CAEEL](plots/2019-07-03_volcanoAnalysis/ce.html)
+
+[HUMAN](plots/2019-07-03_volcanoAnalysis/hs.html)
+
 ### 2020-07-02 Volcano plot S02 vs S06 with correct FC range.
 Parameters
 Treshold on protein id.
