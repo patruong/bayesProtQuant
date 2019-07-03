@@ -257,8 +257,8 @@ if __name__ == "__main__":
                 fc_treshold = -9
             fc_dev = fc_treshold/2
             side = "two"
-            vertical_line_r = fc_treshold + fc_dev
-            vertical_line_l = fc_treshold - fc_dev
+            vertical_line_r = fc_treshold 
+            vertical_line_l = -fc_treshold
             if specie == "HUMAN":
                 df_t = hs_t
                 df_s = hs_s
