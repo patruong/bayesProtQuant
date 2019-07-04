@@ -19,6 +19,15 @@ Also here is a link to a page [page2](page2)
 ## Tools
 
 ## Project Log
+### 2020-07-04 n differentially expressed proteins vs q-value plot.
+HUMAN S02 vs S06
+![](plots/2019-07-04_nProt_diffExp/HUMAN_S02vsS06.png)
+
+CAEEL S02 vs S06
+![](plots/2019-07-04_nProt_diffExp/CAEEL_S02vsS06.png)
+
+ARATH S02 vs S06
+![](plots/2019-07-04_nProt_diffExp/ARATH_S02vsS06.png)
 ### 2020-07-03 Differential expression.
 Parameters
 Treshold on protein id.
